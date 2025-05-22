@@ -1,0 +1,206 @@
+
+{
+"internal": {
+    "control": [ "OP_INFO", "OP_COMMENT", "OP_NO_RETURN", "OP_FINAL_EXEC", "OP_ATTACH", "OP_TERMINATE", "OP_SLEEP", "OP_REFRESH_PROMPT" ],
+    "kctl": [ "k8s_config", "k8s_context", "k8s_namespace", "k8s_pod" ]
+},
+"podConverter" : {
+    "p2c" : {
+        "busybox" : "busybox.*",
+        "main" : ".*"
+        },
+   "p2cLogs" : {
+       "busybox" : "logs",
+       "main" : ".*"
+       }
+},
+"shortcuts" : {
+  "KCTL" : "kubectl --context {{k8s_context}} -n {{k8s_namespace}}",
+  "KCTL_EXEC" : "{{KCTL}} exec {{k8s_pod}} -c {{p2c}} -- ",
+  "KCTL_EXEC_BASH" : "{{KCTL}} exec {{k8s_pod}} -c {{p2c}} -- /bin/bash -c ",
+  "KCTL_EXEC_IT" : "{{KCTL}} exec -it {{k8s_pod}} -c {{p2c}} -- ",
+  "KCTL_EXEC_IT_BASH" : "{{KCTL}} exec -it {{k8s_pod}} -c {{p2c}} -- /bin/bash -c ",
+  "KCTL_LOGS_SWITCHES" : " --prefix --timestamps --max-log-requests 100 ",
+  "KCTL_LOGS1" : "{{KCTL}} logs -f {{KCTL_LOGS_SWITCHES}} {{k8s_pod}} -c {{p2c}} ",
+  "KCTL_LOGS2" : "{{KCTL}} logs -f {{KCTL_LOGS_SWITCHES}} {{k8s_pod}} -c {{p2cLog}} "
+},
+"scripts" : { 
+    "custom": [
+        "{{OP_INFO}} custom shell script, just passing variables",
+        "{{OP_COMMENT}} all logic is within a script",
+        "custom.sh {{k8s_context}} {{k8s_namespace}} {{k8s_pod}} {{p2c}}"
+    ],
+    "test": [
+        "{{OP_INFO}} test no kubectl",
+        "echo {{k8s_context}} {{k8s_namespace}}",
+        "{{OP_COMMENT}} test comment",
+        "echo {{k8s_context}} {{k8s_namespace}}",
+        "echo {{k8s_context}} {{k8s_namespace}}"
+    ],
+    "test2": [
+        "{{OP_INFO}} test no kubectl",
+        "ABCD=abcd",
+        "{{OP_SLEEP}} 3",
+        "echo $ABCD",
+        "echo {{k8s_context}} {{k8s_namespace}} {{p2cLogs}}",
+        "SLEEPTIME=$(($RANDOM % 60))",
+        "echo $SLEEPTIME",
+        "sleep $SLEEPTIME",
+        "{{OP_NO_RETURN}}",
+        "echo {{k8s_context}} {{k8s_namespace}} {{p2c}}",
+        "export PS1='abcd $ '",
+        "{{OP_REFRESH_PROMPT}}",
+        "echo {{k8s_context}} {{k8s_namespace}}",
+        "{{OP_FINAL_EXEC}} echo done > /tmp/x"
+    ],
+ 
+    "env": [
+        "{{OP_INFO}} execute env on each pod and put to pod.env file",
+        "{{KCTL_EXEC}} env > {{k8s_pod}}.env"
+    ],
+    "env-ac": [
+        "{{OP_INFO}} execute env on each pod and put to pod.env file, auto close",
+        "{{KCTL_EXEC}} env > {{k8s_pod}}.env",
+        "{{OP_TERMINATE}}"
+    ],
+    "env-at": [
+        "{{OP_INFO}} execute env on each pod and put to pod.env file, auto attach",
+        "{{KCTL_EXEC}} env > {{k8s_podi}}.env",
+        "{{OP_ATTACH}}"
+    ],
+    "procTcp": [
+        "{{OP_INFO}} get /proc/net/tcp on each then convert it to netstat format",
+        "{{KCTL_EXEC}} /bin/cat /proc/net/tcp  > {{k8s_pod}}.procTcp.raw",
+        "cat {{k8s_pod}}.procTcp.raw | ./proc_netstat.sh > {{k8s_pod}}.procTcp.parsed",
+        "{{OP_TERMINATE}}"
+    ],
+    "tcpdump-all": [
+        "{{OP_INFO}} tcpdump on any interface all traffic for 300 seconds or 100k packets",
+	"{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install tcpdump\"",
+        "{{KCTL_EXEC_BASH}} \"timeout 300 tcpdump -i any -w /tmp/{{k8s_pod}}.pcap -s65535 -c 100000\"",
+        "{{KCTL_EXEC_BASH}} \"rm -f /tmp/{{k8s_pod}.pcap.gz && cd /tmp && gzip {{k8s_pod}}.pcap\"",
+        "{{KUBE_CTL}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.pcap.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.pcap.gz",
+        "{{OP_TERMINATE}}"
+    ],
+    "tcpdump-http-80": [
+        "{{OP_INFO}} install tcpdump and start tcpdump on all interfaces on port 80",
+        "{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install tcpdump\"",
+        "{{KCTL_EXEC_BASH}} \"timeout 300 tcpdump -i any -w /tmp/{{k8s_pod}}.pcap -s65535 -c 100000 port 80\"",
+        "{{KCTL_EXEC_BASH}} \"rm -f /tmp/{{pod}}.pcap.gz && cd /tmp && gzip {{k8s_pod}}.pcap\"",
+        "{{KUBE_CTL}} + 'cp {{k8s_pod}}:/tmp/{{k8s_pod}}.pcap.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.pcap.gz",
+        "{{OP_TERMINATE}}"
+    ],
+    "tcpdump-redis-6379": [
+	"{{OP_INFO}} install tcpdump and start tcpdump on all interfaces on port 6379",
+        "{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install tcpdump\"",
+        "{{KCTL_EXEC_BASH}} \"timeout 300 tcpdump -i any -w /tmp/{pod}.pcap -s65535 -c 100000 port 6379\"",
+        "{{KCTL_EXEC_BASH}} \"rm -f /tmp/{{k8s_pod}}.pcap.gz && cd /tmp && gzip {{k8s_pod}}.pcap\"",
+        "{{KUBE_CTL}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.pcap.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.pcap.gz",
+        "{{OP_TERMINATE}}"
+    ],
+    "tcpdump-memcache-11211": [
+        "{{OP_INFO}} install tcpdump and start tcpdump on all interfaces on port 11211",
+        "{{KCTL_EXEC}} \"apt -y update && apt -y install tcpdump\"",
+        "{{KCTL_EXEC}} \"timeout 300 tcpdump -i any -w /tmp/{pod}.pcap -s65535 -c 100000 port 11211\"",
+        "{{KCTL_EXEC}} \"rm -f /tmp/{{k8s_pod}}.pcap.gz && cd /tmp && gzip {{k8s_pod}}.pcap\"",
+        "{{KUBE_CTL}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.pcap.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.pcap.gz",
+        "{{OP_TERMINATE}}"
+    ],
+    "strace-php": [
+        "{{OP_INFO}} install strace and start strace on all php processes",
+        "{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install strace psmisc procps\"",
+	"{{KCTL_EXEC_BASH}} \"timeout 300 strace -o /tmp/{{k8s_pod}}.strace -s999999 -yy -tt -T $(pgrep php | awk '{ print \" -p \" $1}') \"",
+        "{{KCTL_EXEC_BASH}} \"rm -f /tmp/{{k8s_pod}}.strace.gz && cd /tmp && gzip {{k8s_pod}}.strace\"",
+        "{{KUBE_CTL}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.strace.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.strace.gz",
+        "{{OP_TERMINATE}}"
+    ],
+    "strace-net-php": [
+        "{{OP_INFO}} install strace and start strace on all php processes record net system calls",
+        "{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install strace psmisc procps\"",
+	"{{KCTL_EXEC_BASH}} \"timeout 300 strace -o /tmp/{{k8s_pod}}.strace -s999999 -yy -tt -T $(pgrep php | xargs -Ix echo -p x ) \"",
+        "{{KCTL_EXEC_BASH}} \"rm -f /tmp/{{k8s_pod}}.strace.gz && cd /tmp && gzip {{k8s_pod}}.strace\"",
+        "{{KUBE_CTL}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.strace.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.strace.gz",
+        "{{OP_TERMINATE}}"
+    ],
+    "ping-KubeSvcHost": [
+        "{{OP_INFO}} install ping util and ping KUBERNETES_SERVICE_HOST env variable ip",
+        "{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install iputils-ping\"",
+        "{{KCTL_EXEC_BASH}} \"ping -c 10 ' + '\\' + '$KUBERNETES_SERVICE_HOST\"",
+        "{{OP_TERMINATE}}"
+    ],
+    "tcpdump-install": [
+        "{{OP_INFO}} install tcpdump",
+        "{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install tcpdump\"",
+        "{{DO_TERMINATE}}"
+    ],
+    "strace-install": [
+        "{{OP_INFO}} install strace",
+        "{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install strace\"",
+        "{{DO_TERMINATE}}"
+    ],
+    "ping-install": [
+        "{{OP_INFO}} install ping",
+        "{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install iputils-ping\"",
+        "{{DO_TERMINATE}}"
+    ],
+    "ps-install": [
+        "{{OP_INFO}} install ps and pgrep",
+        "{{KCTL_EXEC_BASH}} \"apt -y update && apt -y install psmisc procps\"",
+        "{{DO_TERMINATE}}"
+    ],
+    "ps-tcpdump": [
+        "{{OP_INFO}} check each pod if there is tcpdump process left running, attaches tmux",
+        "{{KCTL_EXEC_BASH}} \"ps ax | grep tcpdump\"",
+        "{{DO_ATTACH}}"
+    ],
+    "kctl-exec-it-bash": [
+        "{{OP_INFO}} execute bash on each pod in interactive mode and attach to tmux",
+        "{{KCTL_EXEC_IT}} /bin/bash",
+        "{{OP_NO_RETURN}}",
+        "{{DO_ATTACH}}"
+    ],
+    "kctl-exec-sh": [
+        "{{OP_INFO}} execute sh on each pod in interactive mode and attach to tmux",
+        "{{KCTL_EXEC_IT}} /bin/sh",
+        "{{OP_NO_RETURN}}",
+        "{{OP_COMMENT}} no return after a command instructs not to wait for locally fetched prompt",
+        "{{OP_COMMENT}} so next line is executed/sent to kubectl shell",
+        "env",
+        "{{OP_NO_RETURN}}",
+        "date",
+        "{{OP_NO_RETURN}}",
+        "{{OP_SLEEP}} 4",
+        "date",
+        "{{OP_COMMENT}} in kubectl exec we have new prompt different than one on local machine",
+        "{{OP_COMMENT}} instruct this tool to load new prompt",
+        "{{OP_REFRESH_PROMPT}}",
+        "date",
+        "date",
+        "date",
+        "{{DO_ATTACH}}"
+    ],
+    "exec-it-sh": [
+        "{{OP_INFO}} execute sh on each pod in interactive mode and attach to tmux",
+        "{{KCTL_EXEC_IT}} /bin/sh",
+        "{{OP_NO_RETURN}}",
+        "{{DO_ATTACH}}"
+    ],
+    "logs1": [
+        "{{OP_INFO}} execute kubectl logs on each pod/container, pass it to local file then tail all files to console",
+        "{{KCTL_LOGS1}} > {{k8s_namespace}}_logs_{{k8s_pod}}_{p2c}.log",
+        "{{OP_NO_RETURN}}",
+        "{{OP_FINAL_EXEC}} tail -f -q {{k8s_namespace}}_logs_*"
+    ],
+    "logs2": [
+        "{{OP_INFO}} execute kubectl logs on each pod/container, pass it to local file then tail all files to console",
+        "{{KCTL_LOGS2}} > {{k8s_namespace}}_logs_{{k8s_pod}}_{p2cLog}.log",
+        "{{OP_NO_RETURN}}",
+        "{{OP_FINAL_EXEC}} tail -f -q {{k8s_namespace}}_logs_*"
+    ],
+    "dry": [
+        "{{OP_INFO}} just echo {{k8s_context}} {{k8s_namespace}} {{k8s_pod}} and {{p2c}} values",
+        "echo \"ctx {{k8s_context}} ns {{k8s_namespace}} pod {{k8s_pod}} co {{p2c}}\" ",
+        "{{DO_ATTACH}}"
+    ]
+  } 
+}

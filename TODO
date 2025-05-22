@@ -1,0 +1,9 @@
+
+TODO:
+ 
+Add -T switch to terminate tmux if same session exists
+catch prompt as regexp
+
+In k8s.go consider senting containers name list []string, currently not needed
+
+

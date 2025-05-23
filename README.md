@@ -67,6 +67,7 @@ nginx-sample1-6475dd48b7-br6jc   1/1     Running   0          16h   app=nginx,po
 nginx-sample1-6475dd48b7-n6mtg   1/1     Running   0          16h   app=nginx,pod-template-hash=6475dd48b7,ver=v1
 ```
 
+## One-liner example
 let's run simple one-liner
 ```console
 $ kubectl tks -n test-run start -l app=nginx  "kubectl -n test-run exec {{k8s_pod}} -c nginx -- env"
@@ -87,6 +88,7 @@ you can check what has been executed by attaching to tmux
 $ tmux a
 ```
 
+## one-liner leaves tmux session open
 if you run same command second time (and if you have not terminated previous tmux session) you will get
 ```console
 $ kubectl tks -n test-run start -l app=nginx  "kubectl -n test-run exec {{k8s_pod}} -c nginx -- env"
@@ -94,7 +96,14 @@ $ kubectl tks -n test-run start -l app=nginx  "kubectl -n test-run exec {{k8s_po
 # unable to open sequence json file /Users/none/.tks/sequences.json
 # there is already session with this name (OneLiner--test-run), exiting
 ```
+you can use
+```console
+tmux ls
+```
+to check what sessions are running.
 
+
+## one-liner with previous session removal
 If you want to start and remove previous session, remember to use -T option.
 You can always remove previous session with tmux kill-session -t <session_name> .
 Flag -T  will terminate previous session of a same name. Session Names are
@@ -116,6 +125,8 @@ $ kubectl tks -n test-run start -l app=nginx  "kubectl -n test-run exec -t {{k8s
 #COMPLETED
 ```
 
+## one-liner with more kubernetes related templated fiels
+
 Now you can see we used k8s_pod as temlpate field for each pod was there in test-run namespace.
 We can also use k8s_namespace template field to specify namespace (so you don't have to repeat test-run)
 There are also k8s_config and k8s_context template fields that would be filled if specified within tks command line
@@ -136,6 +147,8 @@ $ kubectl tks -n test-run start -l app=nginx  "kubectl -n {{k8s_namespace}} exec
 #COMPLETED
 ```
 
+
+## one-liner with dry run mode
 You can always run command in dry-run mode with -d flag, only output will be printend, but templated fields will
 encoded. Table shows podname, pod number, script line number, then command that would have been executed
 
@@ -148,30 +161,35 @@ nginx-sample1-6475dd48b7-br6jc 1 0 kubectl -n test-run exec -t nginx-sample1-647
 nginx-sample1-6475dd48b7-n6mtg 2 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
 ```
 
+
+## one-liner with more then one executions
 You can specify more than one command in One-Liner execution. Commands are separated by ';' sign.
 ```console
 $ kubectl tks -n test-run start -l app=nginx  "kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c nginx -- env;echo {{k8s_pod}}" -T
 ```
 You can do tmux attach to inspect execution, by switching between tmux terminal windows.
 
-
+## one-liner with attaching to tmux session
 If you do not want to manually attach to execution every time you can add OP_ command for attaching 
 
 ```console
 $ kubectl tks -n test-run start -l app=nginx  "kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c nginx -- env;{{OP_ATTACH}}" -T
 ```
-Now at the end of execution tks will attach tmux session it created
+Now at the end of execution tks will attach tmux session it created. 
 There are more OP_ commands available, you can find more in question sectoin Q: What other OP_ commands are available ?
 
 
-If you are tired of creating One-Liners you have to rememver, you could copy sequence.json to ~/tks directory
-(as mentioned in installation step above)
+## using sequence file for storing complex scripts
+If you are tired of creating One-Liners you have to remember, you could copy sequence.json to ~/tks directory
+(as mentioned in installation step 3 and 4 above)
 
+## sequence.json contents
 sequence.json file cotains 3 sections:
 - scripts
 - shortcuts
 - podConverter
 
+### sequence.json - scripts section 
 Scripts section define script name and list of actions.
 For example:
 ```console
@@ -187,7 +205,7 @@ long OneLiners.
 
 so you can run
 ```console
-$ kubectl tks -n test-run start -l app=nginx  env-nginx-simple -T
+$ kubectl tks -n test-run start env-nginx-simple -l app=nginx -T
 #### Creating new session env-nginx-simple--test-run
 #### Creating windows per pod
 #### Collecting prompts for each window
@@ -206,7 +224,8 @@ $ kubectl tks -n test-run start -l app=nginx  env-nginx-simple -T
 You can checkk files in local directory, there should be nginx-sample1- .env files for each pod
 Also you can attach tmux, as it's left running.
 
-in sequence.json scripts there is :
+### sequence.json - scripts - scripts with OP_ commands 
+In sequence.json scripts there is :
 ```console
     "env-nginx-simple-t": [
         "{{OP_INFO}} execute env on each pod and put to pod.env file, terminate tmux",
@@ -217,25 +236,71 @@ in sequence.json scripts there is :
 ```
 If you run this one, OP_TERMINATE will instruct tks to terminate tmux session, you will get only env files.
 
+### sequence.json - list available scripts
 You can check a list of available scripts within sequence.json like this
 ```console
 kubectl tks list scripts
+...
+...
+
 ```
+you will get list of scripts with their info , scripts that are available in sequence.json file
+
+If you want to use some other sequence.json you can always use -f other_sequence_file.json
+
+Do 
+```console
+kubectl tks list
+```
+for more details on what can be listed.
+
+Currently we know for following OP_ comands:
 OP_INFO line is used as information printed when tks list scripts is called
+OP_TERMINATE terminates tmux session
+OP_ATTACH attached to tmux session
 Check also answer below for question Q: What other OP_ commands are available ? 
 
-
+### sequence.json - shortcuts
 If you get tired of writing full kubectl line every time you can use shortcuts.
+
+If there are parts of scripts that you use that are frequently repeated instead of
+```console
+"kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c nginx  -- env > {{k8s_pod}}.env"
+```
+you can define shortcut
+```console
+"XKNE" : "kubectl -n {{k8s_namespace}} exec "
+```consle
+and use
+```console
+"{{XKNE}} -c nginx -- env > {{k8s_pod}}}.env"
+```
+and 
+
+### sequence - how template fields are replacetd and in which order
+
+Before executing of each line:
+- if line is OP_ command it handled from case to case
+- otherwise command is for execution so :
+    * first shortcuts template fields are being resolved, 
+    * then k8s_ template fields are being replaced
+    * then podConverter mappings
+
+
+### sequence.json - shortcuts - available shortcuts
 you can list available shortcuts
 ```console
 kubectl tks list shortcuts
 $ kubectl tks list shortcuts
-KN - kubectl -n {{k8s_namespace}}
+K - kubectl
+KN - {{K}} -n {{k8s_namespace}}
 KNE - {{KN}} exec {{k8s_pod}}
-KCN - kubectl --context {{k8s_context}} -n {{k8s_namespace}}
 KNEC - {{KNE}} -c {{p2c}}
-KCNEC- - {{KCNE}} -c {{p2c}} --
+KNEC- - {{KNEC}} --
+KCN - kubectl --context {{k8s_context}} -n {{k8s_namespace}}
+KCNE - {{KCN}} exec {{k8s_pod}}
 KCNEC - {{KCNE}} -c {{p2c}}
+KCNEC- - {{KCNE}} -c {{p2c}} --
 KCTL - kubectl --context {{k8s_context}} -n {{k8s_namespace}}
 KCTL_EXEC - {{KCTL}} exec {{k8s_pod}} -c {{p2c}} --
 KCTL_EXEC_IT - {{KCTL}} exec -it {{k8s_pod}} -c {{p2c}} --
@@ -244,31 +309,14 @@ KCTL_LOGS_SWITCHES -  --prefix --timestamps --max-log-requests 100
 KCTL_LOGS1 - {{KCTL}} logs -f {{KCTL_LOGS_SWITCHES}} {{k8s_pod}} -c {{p2c}}
 KCTL_LOGS2 - {{KCTL}} logs -f {{KCTL_LOGS_SWITCHES}} {{k8s_pod}} -c {{p2cLog}}
 KCTL_EXEC_BASH - {{KCTL}} exec {{k8s_pod}} -c {{p2c}} -- /bin/bash -c
-K - kubectl
-KCNE - {{KCN}} exec {{k8s_pod}}
 ```
 
-if there are parts of scripts that you use that are frequently repeated instead of
-```console
-"kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c nginx  -- env > {{k8s_pod}}.env"
-```
-you can use
-```console
-"{{KNE}} -c nginx -- env > {{k8s_pod}}}.env"
-```
-
-Before executing of each line:
-- if line is OP_ command it handled from case to case
-- otherwise command is for execution so :
-    * first shortcuts are being resolved, 
-    * then k8s_ variables
-    * then podConverter mappings
-
+## sequence.json - podConverter intro
 While running tks in various cases you might have to run same script (list of commands) on various pods.
 Some pods might have different pod name (pod that you are interested to jump and execute something in),
-or it might have differetn shell, for example not /bin/sh but /bin/bash.
+some might have different container name, or it might have differetn shell, for example not /bin/sh but /bin/bash.
 
-To me able to make reusable script on various kinds pods there is podConverter section of sequence.json
+To make script reusable on various kinds pods there is podConverter section of sequence.json
 Below is a section that describe rules that would be used for mapping pod name to container name
 ```console
 "podConverter" : {
@@ -302,6 +350,7 @@ ie
 "kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c {{p2c}}  -- /bin/sh `env > {{k8s_pod}}.env`"
 ```
 
+### sequence.json - podConverter - adding second rule
 In some cases containers that do print logs are not the same container so you can specify new podConverter section
 ```console
    "p2cLogs" : {
@@ -312,15 +361,16 @@ In some cases containers that do print logs are not the same container so you ca
 and you can use {{p2cLogs}} field template in your scripts.
 
 
-
-Now that you have sequences.json you can
+### sequence.json - podConverters in oneLiners
+Now that you have sequences.json you can use podConverters in your OneLiners
+```console
 $ kubectl tks -n test-run start -l app=nginx  "kubectl -n {{k8s_namespace}} exec -t {{k8s_pod}} -c {{p2c}} -- env" -d
 # No script kubectl -n {{k8s_namespace}} exec -t {{k8s_pod}} -c {{p2c}} -- env in sequence file /Users/none/.tks/sequences.json, assuming oneLiner
 # No matching script kubectl -n {{k8s_namespace}} exec -t {{k8s_pod}} -c {{p2c}} -- env in conf file
 nginx-sample1-6475dd48b7-bgtsx 0 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-bgtsx -c nginx -- env
 nginx-sample1-6475dd48b7-br6jc 1 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-br6jc -c nginx -- env
 nginx-sample1-6475dd48b7-n6mtg 2 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
-
+```
 
 
 

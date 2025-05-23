@@ -149,6 +149,7 @@ func ExpandP2cRule(rules map[string]string, keys []string, pod string) string {
 	for i := 0; i < len(keys); i++ {
 		var err error = nil
 		matched := false
+		//fmt.Println(keys[i],rules[keys[i]],pod)
 		matched, err = regexp.Match(rules[keys[i]], []byte(pod))
 		if err != nil {
 			fmt.Println("Non fatal Error, failed in compiling p2c rules")

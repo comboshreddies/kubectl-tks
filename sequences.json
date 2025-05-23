@@ -1,24 +1,14 @@
 {
   "podConverter": {
-    "p2c": [
-      {
-        "busybox": "busybox.*"
-      },
-      {
-        "nginx": "nginx.*"
-      },
-      {
-        "main": ".*"
-      }
-    ],
-    "p2cLogs": [
-      {
-        "busybox": "logs"
-      },
-      {
-        "main": ".*"
-      }
-    ]
+    "p2c": {
+      "busybox": "busybox.*",
+      "nginx": "nginx.*",
+      "main": ".*"
+    },
+    "p2cLogs": {
+      "busybox": "logs",
+      "main": ".*"
+    }
   },
   "shortcuts": {
     "K": "kubectl ",

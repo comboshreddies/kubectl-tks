@@ -110,6 +110,7 @@ func processStart(cmd *cobra.Command, args []string) {
 	tmuxIn.K8sNamespace = o.K8sNamespace
 	tmuxIn.PodList = filteredPodList
 	tmuxIn.Shorts = seq.Shorts
+	tmuxIn.ShortsKeys = seq.ShortsKeys
 	tmuxIn.PodCs = seq.PodCs
 	tmuxIn.Prompt = o.KTxPrompt
 	tmuxIn.PromptSleep = o.KTxPromptSleep

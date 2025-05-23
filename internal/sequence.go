@@ -59,6 +59,7 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 				}
 				seq.PodCs = append(seq.PodCs, x)
 			}
+			fmt.Println("#PodConverter loaded from sequence.file")
 		}
 		if key == "shortcuts" {
 			seq.Shorts = make(map[string]string)
@@ -67,6 +68,7 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 				seq.Shorts[key1] = val1.(string)
 			}
 			slices.Sort(seq.ShortsKeys)
+			fmt.Println("#Shortcuts loaded from sequence.file")
 		}
 		if key == "scripts" {
 			var t scriptItem
@@ -79,6 +81,7 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 				t.Items = cmdList
 				seq.Scripts = append(seq.Scripts, t)
 			}
+			fmt.Println("#Sripts loaded from sequence.file")
 		}
 	}
 	return seq, nil

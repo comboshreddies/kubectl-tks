@@ -50,10 +50,6 @@ func main() {
 			cmd.Execute()
 			break
 		}
-		//   fmt.Println("execute ended")
-		//   time.Sleep(3 * time.Second)
-		//   fmt.Println("sleep ended")
-		//   cancel()
 		done <- true
 	}
 

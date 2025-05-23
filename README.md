@@ -372,6 +372,49 @@ nginx-sample1-6475dd48b7-br6jc 1 0 kubectl -n test-run exec -t nginx-sample1-647
 nginx-sample1-6475dd48b7-n6mtg 2 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
 ```
 
+# advanced topics
+## executing within kubectl exec on pod
+
+Once tks tool is started, new session tmux session is created. Then for each pod new tmux window (and pane) is created.
+First thing after creating windows for each pod is fetching prompt line. Prompt will be used to confirm that
+previous command has been executed and that next command can be executed. 
+
+After every command execution tks tool will wait for prompt to appear, so that it can execute next command.
+There is a command that can canel this behaviour. After each command there is look ahead, if next step is
+OP_NO_PROMPT_WAIT, tks will not wait for prompt to return, it will start executing next command as soon as it can.
+
+There are cases where prompt changes, for example if you  kubectl exec to remote pod you will get prompt from pod.
+Usually that prompt is pod name, but it can be anything. In such cases, in order to continue, and not to wait for prompt that was initially loaded (local host prompt) there is OP_REFRESH_PROMPT, this command will read prompt again.
+
+There are cases where you might benefit from some sleep time, so there is OP_SLEEP, this command have an argument
+```console
+"{{OP_SLEEP}} 5"
+```
+this will sleep for 5 seconds - it will sleep on tks/tmux side.
+
+OP_SLEEP could be used if you access remote node that can have slow response time, so refreshing prompt won't help,
+but sleeping few seconds might help.
+
+If you want to comment some operation there is OP_COMMENT, everything after this OP_COMMENT will be rendered and printed out. For example:
+```console
+"{{OP_COMMENT}} this command will do something on {{k8s_pod}}"
+```
+will print something like
+```console
+"#COMMENT: this command will do something on nginx-sample1-6475dd48b7-bgtsx"
+```
+As mentioned above if you use OP_TERMINATE at last execution step tmux session will be terminated (along with all shell terminals). OP_ATTACH will attach to tmux, so you can inspect manually in tmux.
+
+OP_FINALLY is used to do some final (like aggregation or processing) job, once, on tks side. For example:
+```console
+   "env-nginx-simple": [
+        "kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c nginx  -- env > {{k8s_pod}}.env",
+        "{{OP_FINALLY}} tar czvf nginx.tgz *.env ; rm *.env"
+    ],
+```
+This script will get environment from all needed pods, then finally it will make archive and remove env files.
+
+OP_FINALLY, OP_TERMINATE, OP_ATTACH are end script commands. No more steps will be executed after those instructions.
 
 
 # FAQ

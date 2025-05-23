@@ -25,9 +25,24 @@ func init() {
 }
 
 func processList(cmd *cobra.Command, args []string) {
-	fmt.Println("list: .... ")
 	if len(args) != 1 {
 		fmt.Println("list needs argument: scripts, shortcuts, podConverter, control")
+	}
+
+	if args[0] == "kctl" {
+		fmt.Printf("Kubectl params:\n")
+		for i := 0; i < len(internal.SupportedKctl); i++ {
+			fmt.Printf(" %s\n", internal.KctlVariables[internal.SupportedKctl[i]])
+		}
+		return
+	}
+
+	if args[0] == "control" {
+		fmt.Printf("Controls:\n")
+		for i := 0; i < len(internal.SupportedOps); i++ {
+			fmt.Printf(" %s - %s\n", internal.OpInstruction[internal.SupportedOps[i]], internal.OpName[internal.SupportedOps[i]])
+		}
+		return
 	}
 
 	if o.ScriptFile == "" {
@@ -40,8 +55,11 @@ func processList(cmd *cobra.Command, args []string) {
 
 	seq, err := internal.OpenAndReadSequencefile(o.ScriptFile)
 	if err != nil {
+		fmt.Printf("Can't read conf file\n")
 		fmt.Println(err)
+		return
 	}
+
 	var keys []string
 	if args[0] == "scripts" {
 		for i := range seq.Scripts {
@@ -69,47 +87,4 @@ func processList(cmd *cobra.Command, args []string) {
 			fmt.Printf("%s -\n", seq.PodCs[i].Name)
 		}
 	}
-	if args[0] == "control" {
-		for i := 0; i < len(seq.Predefs); i++ {
-			if seq.Predefs[i].Name == "control" {
-				fmt.Printf("%s :\n", seq.Predefs[i].Name)
-				for j := 0; j < len(seq.Predefs[i].Tags); j++ {
-					fmt.Printf(" - %s", seq.Predefs[i].Tags[j])
-					switch seq.Predefs[i].Tags[j] {
-					case "OP_INFO":
-						fmt.Printf(" : Info for that script, kind of introduction help line\n")
-					case "OP_COMMENT":
-						fmt.Printf(" : All content of this script instruction line will be just echoed to stdout\n")
-					case "OP_NO_RETURN":
-						fmt.Printf(" : Do not wait for return, do not read expected prompt line, jump to next script line\n")
-					case "OP_FINAL_EXEC":
-						fmt.Printf(" : After scripts are executed on all pods, and tmux terminated, execute this script line \n")
-					case "OP_ATTACH":
-						fmt.Printf(" : After script execution attach to tmux\n")
-					case "OP_TERMINATE":
-						fmt.Printf(" : After scripts execution terminate tmux and it's session\n")
-					case "OP_SLEEP":
-						fmt.Printf(" : Sleep for desired time on control process, before attaching, terminating or being interrupted\n")
-					case "OP_REFRESH_PROMPT":
-						fmt.Printf(" : Load new prompt line after previuos script line execution (remote session or changing prompt line)\n")
-					case "OP_SYNC":
-						fmt.Printf(" : Synchronize execution on all tmux terminals before proceeding with next script line\n")
-					default:
-						fmt.Println()
-					}
-				}
-			}
-		}
-	}
-	if args[0] == "kctl" {
-		for i := 0; i < len(seq.Predefs); i++ {
-			if seq.Predefs[i].Name == "kctl" {
-				fmt.Printf("%s :\n", seq.Predefs[i].Name)
-				for j := 0; j < len(seq.Predefs[i].Tags); j++ {
-					fmt.Printf(" - %s\n", seq.Predefs[i].Tags[j])
-				}
-			}
-		}
-	}
-
 }

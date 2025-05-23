@@ -27,9 +27,9 @@ func init() {
 }
 
 var cmdStart = &cobra.Command{
-	Use:   "start script",
-	Short: "start execution of a selected script from sequence file",
-	Long:  `start execution of a selected script from sequence file`,
+	Use:   "start script|quotedCommand",
+	Short: "execute of the script from sequence file, if no script it will execute argument",
+	Long:  `start execution of a selected script from sequence file, if no script it will consider argument is quoted set of commands that are ';' separated`,
 	Args:  cobra.MinimumNArgs(1),
 	Run:   processStart,
 }
@@ -46,16 +46,39 @@ func processStart(cmd *cobra.Command, args []string) {
 			o.ScriptFile = "sequences.json"
 		}
 	}
+
+	noConfFile := false
 	seq, err := internal.OpenAndReadSequencefile(o.ScriptFile)
 	if err != nil {
+		fmt.Printf("# Unable to read conf file %s, assuming oneLiner\n", o.ScriptFile)
 		fmt.Println(err)
-		return
+		noConfFile = true
+		seq = internal.SequenceConfig{}
+		seq.Shorts = nil
 	}
 
-	seqOffset, err := internal.IsThereAScript(args[0], seq.Scripts)
-	if err != nil {
-		fmt.Println(err)
-		return
+	noScript := false
+	seqOffset := -1
+	if noConfFile == false {
+		seqOffset, err = internal.IsThereAScript(args[0], seq.Scripts)
+		if err != nil {
+			fmt.Printf("# No script %s in sequence file %s, assuming oneLiner\n", args[0], o.ScriptFile)
+			fmt.Println(err)
+			noScript = true
+		}
+	}
+
+	var scriptLines []string
+	var scriptName string
+	if noConfFile == true || noScript == true {
+		splitArg0 := strings.Split(args[0], ";")
+		for i := 0; i < len(splitArg0); i++ {
+			scriptLines = append(scriptLines, splitArg0[i][0:len(splitArg0[i])])
+		}
+		scriptName = "OneLiner"
+	} else {
+		scriptLines = seq.Scripts[seqOffset].Items
+		scriptName = args[0]
 	}
 
 	podList, err := internal.Kubernetes_pod_list(o.K8sConfig, o.K8sContext, o.K8sNamespace, o.K8sSelector)
@@ -80,8 +103,8 @@ func processStart(cmd *cobra.Command, args []string) {
 	}
 
 	tmuxIn := internal.TmuxInData{}
-	tmuxIn.SeqName = args[0]
-	tmuxIn.ScriptLines = seq.Scripts[seqOffset].Items
+	tmuxIn.SeqName = scriptName
+	tmuxIn.ScriptLines = scriptLines
 	tmuxIn.K8sConfig = o.K8sConfig
 	tmuxIn.K8sContext = o.K8sContext
 	tmuxIn.K8sNamespace = o.K8sNamespace

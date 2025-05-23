@@ -59,8 +59,6 @@ func main() {
 
 	stopIt = false
 	go executor(ctx, &stopIt)
-	fmt.Println("awaiting signal")
 	<-done
 	cancel()
-	// fmt.Println("exiting")
 }

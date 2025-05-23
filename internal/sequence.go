@@ -21,11 +21,6 @@ type shortcuts struct {
 	Value string
 }
 
-type predefined struct {
-	Name string
-	Tags []string
-}
-
 type podConverter struct {
 	Name  string
 	Rules []p2cRule
@@ -37,19 +32,18 @@ type p2cRule struct {
 	Regexp string
 }
 
-type sequenceConfig struct {
-	Predefs []predefined
+type SequenceConfig struct {
 	PodCs   []podConverter
 	Shorts  []shortcuts
 	Scripts []scriptItem
 }
 
-func OpenAndReadSequencefile(fileName string) (conf sequenceConfig, err error) {
-	var seq sequenceConfig
+func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
+	var seq SequenceConfig
 
 	jsonFile, err := os.Open(fileName)
 	if err != nil {
-		return sequenceConfig{}, errors.New("unable to open sequence json file " + fileName)
+		return SequenceConfig{}, errors.New("# unable to open sequence json file " + fileName)
 	}
 	defer jsonFile.Close()
 
@@ -58,21 +52,11 @@ func OpenAndReadSequencefile(fileName string) (conf sequenceConfig, err error) {
 	var result map[string]interface{}
 	err = json.Unmarshal([]byte(byteValue), &result)
 	if err != nil {
-		newerr := errors.New("unable to load json from sequence json file")
-		return sequenceConfig{}, newerr
+		newerr := errors.New("# unable to load json from sequence json file")
+		return SequenceConfig{}, newerr
 	}
 
 	for key, val := range result {
-		if key == "internal" {
-			for key1, val1 := range val.(map[string]interface{}) {
-				var t predefined
-				t.Name = key1
-				for _, val2 := range val1.([]interface{}) {
-					t.Tags = append(t.Tags, val2.(string))
-				}
-				seq.Predefs = append(seq.Predefs, t)
-			}
-		}
 		if key == "podConverter" {
 			for key1, val1 := range val.(map[string]interface{}) {
 				var x podConverter
@@ -113,22 +97,23 @@ func OpenAndReadSequencefile(fileName string) (conf sequenceConfig, err error) {
 func OpLineTagToOpString(line string) (print, operation string) {
 	ret_print := "UNKNOWN_OPERATION"
 	ret_operation := "OP_UNKNOWN"
-	if line[:5] != "{{OP_" {
+	if len(line) > 7 && line[:5] != "{{OP_" {
 		return ret_print, ret_operation
 	}
 	check_operation := strings.Split(line[2:], "}}")[0]
-	switch check_operation {
-	case "OP_INFO", "OP_COMMENT", "OP_NO_RETURN", "OP_FINAL_EXEC", "OP_ATTACH", "OP_TERMINATE", "OP_SLEEP", "OP_REFRESH_PROMPT", "OP_SYNC":
-		ret_print = check_operation[3:]
-		ret_operation = check_operation
+	for i:=0; i < len(SupportedOps); i++ {
+		if  OpInstruction[SupportedOps[i]] == check_operation {
+			ret_print = check_operation[3:]
+			ret_operation = OpInstruction[SupportedOps[i]] 
+                        break
+		}
 	}
-	//fmt.Println(ret_operation)
+        // fmt.Println("_ ",ret_print, ret_operation)
 	return ret_print, ret_operation
 }
 
 func OpLineTagToString(line string) string {
 	to_print, operation := OpLineTagToOpString(line)
-	//fmt.Printf("#%s: ->%s<- %d\n", to_print, line, len(line))
 	return fmt.Sprintf("#%s:%s", to_print, line[len(operation)+4:])
 }
 
@@ -150,11 +135,12 @@ func ExpandShortcuts(line string, shorts []shortcuts) string {
 	return newLine
 }
 
-func ExpandK8s(line, K8sContext, K8sNamespace, K8sPod string) string {
+func ExpandK8s(line, K8sConfig, K8sContext, K8sNamespace, K8sPod string) string {
 	newLine := line
 	for l := 0; l < 100; l++ {
 		changes := false
-		after := strings.Replace(newLine, "{{k8s_context}}", K8sContext, 10)
+		after := strings.Replace(newLine, "{{k8s_config}}", K8sConfig, 10)
+		after = strings.Replace(after, "{{k8s_context}}", K8sContext, 10)
 		after = strings.Replace(after, "{{k8s_namespace}}", K8sNamespace, 10)
 		after = strings.Replace(after, "{{k8s_pod}}", K8sPod, 10)
 		if after != newLine {
@@ -214,9 +200,27 @@ func IsThereAScript(name string, scripts []scriptItem) (offset int, err error) {
 	}
 
 	if !match {
-		return -1, errors.New("no matching script in sequence file")
+		return -1, errors.New(fmt.Sprintf("# No matching script %s in conf file", name))
 	}
 	return seqOffset, nil
+}
+
+type KctlDecode int
+
+const (
+	KctlConfig KctlDecode = iota
+	KctlContext
+	KctlNamespace
+	KctlPod
+)
+
+var SupportedKctl = []KctlDecode{KctlConfig, KctlContext, KctlNamespace, KctlPod}
+
+var KctlVariables = map[KctlDecode]string{
+	KctlConfig:    "k8s_config",
+	KctlContext:   "k8s_context",
+	KctlNamespace: "k8s_namespace",
+	KctlPod:       "k8s_pod",
 }
 
 type OpDecoded int
@@ -224,6 +228,7 @@ type OpDecoded int
 const (
 	OpTerminate OpDecoded = iota
 	OpAttach
+	OpDetach
 	OpFinally
 	OpExecute
 	OpComment
@@ -234,11 +239,42 @@ const (
 	OpUnknown
 )
 
+var SupportedOps = []OpDecoded{OpTerminate, OpAttach, OpDetach, OpFinally, OpExecute, OpInfo, OpComment, OpNoPrompt, OpSleep, OpRefreshPrompt}
+
+var OpInstruction = map[OpDecoded]string{
+	OpTerminate:     "OP_TERMINATE",
+	OpAttach:        "OP_ATTACH",
+	OpDetach:        "OP_DETACH",
+	OpFinally:       "OP_FINALLY",
+	OpExecute:       "OP_EXECUTE",
+	OpInfo:          "OP_INFO",
+	OpComment:       "OP_COMMENT",
+	OpNoPrompt:      "OP_NO_PROMPT_WAIT",
+	OpSleep:         "OP_SLEEP",
+	OpRefreshPrompt: "OP_REFRESH_PROMPT",
+	OpUnknown:       "Operation_Uknown",
+}
+
+var OpPrint = map[OpDecoded]string{
+	OpTerminate:     "#TERMINATE",
+	OpAttach:        "#ATTACH",
+	OpDetach:        "#DETACH",
+	OpFinally:       "#FINALLY",
+	OpExecute:       "#EXECUTE",
+	OpInfo:          "#INFO",
+	OpComment:       "#COMMENT",
+	OpNoPrompt:      "#NO_PROMPT_WAIT",
+	OpSleep:         "#SLEEP",
+	OpRefreshPrompt: "#REFRESH_PROMPT",
+	OpUnknown:       "#OPeration_Uknown",
+}
+
 var OpName = map[OpDecoded]string{
 	OpTerminate:     "Terminate tmux, script end",
 	OpAttach:        "Attach tmux, script end",
+	OpDetach:        "Detach tmux, script end, default behavior",
 	OpFinally:       "Finally execute, script end",
-	OpExecute:       "Execute line",
+	OpExecute:       "Execute line, no need to specify, default behaviour",
 	OpInfo:          "Print info",
 	OpComment:       "Print comment, render",
 	OpNoPrompt:      "Do not wait for prompt for last command",
@@ -248,7 +284,7 @@ var OpName = map[OpDecoded]string{
 }
 
 func opDecode(inputLine string) (op OpDecoded, line string) {
-	if inputLine[:5] == "{{OP_" {
+	if len(inputLine) > 5 && inputLine[:5] == "{{OP_" {
 		line = OpLineTagToString(inputLine)
 		if len(line) >= 6 && line[:6] == "#INFO:" {
 			return OpInfo, line[6:]
@@ -265,16 +301,19 @@ func opDecode(inputLine string) (op OpDecoded, line string) {
 		if len(line) >= 8 && line[:8] == "#ATTACH:" {
 			return OpAttach, ""
 		}
-		if len(line) >= 12 && line[:12] == "#FINAL_EXEC:" {
+		if len(line) >= 8 && line[:8] == "#DETACH:" {
+			return OpDetach, ""
+		}
+		if len(line) >= 9 && line[:9] == "#FINALLY:" {
 			return OpFinally, line[12:]
 		}
-		if len(line) >= 11 && line[:11] == "#NO_RETURN:" {
+		if len(line) >= 16 && line[:16] == "#NO_PROMPT_WAIT:" {
 			return OpNoPrompt, ""
 		}
 		if len(line) >= 16 && line[:16] == "#REFRESH_PROMPT:" {
 			return OpRefreshPrompt, ""
 		}
 		return OpUnknown, ""
-	}
+        }
 	return OpExecute, inputLine
 }

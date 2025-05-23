@@ -24,10 +24,6 @@ func init() {
 }
 
 func processInfo(cmd *cobra.Command, args []string) {
-	fmt.Println("info: ")
-	fmt.Println(args)
-	fmt.Println(o.ScriptFile)
-	fmt.Println(o.ExpandSeq)
 
 	if o.ScriptFile == "" {
 		if home := homedir.HomeDir(); home != "" {

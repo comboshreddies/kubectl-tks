@@ -55,7 +55,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 	}
 
 	if tmux.HasSession(tmuxSessionName) {
-		fmt.Printf("there is already session with this name (%s), ", tmuxSessionName)
+		fmt.Printf("# there is already session with this name (%s), ", tmuxSessionName)
 		if delTxSess == true {
 			cmd := exec.Command(os.Getenv("SHELL"), "-c", fmt.Sprintf("tmux kill-session -t %s\n", tmuxSessionName))
 			err := cmd.Run()
@@ -101,7 +101,6 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 	time.Sleep(time.Second * time.Duration(ti.PromptSleep))
 
 	windows, err = tmuxSession.ListWindows()
-	// fmt.Println("Windows")
 
 	fmt.Printf("#### Collecting prompts for each window\n")
 	prompts := make(map[int]string)
@@ -111,9 +110,6 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 			fmt.Println("error in fetching pane prompt")
 			return
 		}
-		// fmt.Printf("win %s: prompt %s\n", windows[i].Name, prompts[i])
-		// fmt.Println(windows[i])
-		// fmt.Println("----")
 	}
 	winName2Idx := make(map[string]int)
 	windows, err = tmuxSession.ListWindows()
@@ -136,6 +132,8 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 			case OpTerminate:
 				break
 			case OpAttach:
+				break
+			case OpDetach:
 				break
 			case OpFinally:
 				break
@@ -161,7 +159,6 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 					allComplete := false
 					for allComplete == false {
 						allComplete = true
-						// fmt.Printf("Wait for prompt %t\n",allComplete)
 						for podIdx := 0; podIdx < len(ti.PodList); podIdx++ {
 							current_prompt, err := tmux_get_pane_prompt(windows[podIdx2WinIdx[podIdx]])
 							if err != nil {
@@ -198,7 +195,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 					}
 				}
 			case OpUnknown:
-				fmt.Println("# Unknown operation, skipping\n")
+				fmt.Printf("# Unknown operation, skipping - %s\n",ti.ScriptLines[scrIdx])
 			}
 			switch operation {
 			case OpTerminate:
@@ -212,8 +209,10 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 				fmt.Println("#ATTACH")
 				opts := gotmux.AttachSessionOptions{}
 				tmuxSession.AttachSession(&opts)
+			case OpDetach:
+				fmt.Println("#DETACH")
 			case OpFinally:
-				fmt.Printf("#FINAL_EXEC: %s\n", line)
+				fmt.Printf("#FINALY: %s\n", line)
 				cmd := exec.Command(os.Getenv("SHELL"), "-c", line)
 				err := cmd.Run()
 				if err != nil {
@@ -234,7 +233,6 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 		}
 		shouldWaitForPrompt := make(map[int]map[int]bool)
 		executionSent := make(map[int]map[int]bool)
-		fmt.Printf("number of pods %d\n", len(ti.PodList))
 		for podIdx := 0; podIdx < len(ti.PodList); podIdx++ {
 			shouldWaitForPrompt[podIdx] = map[int]bool{}
 			executionSent[podIdx] = map[int]bool{}
@@ -247,16 +245,12 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 		allPodsComplete := false
 		lastOperation := OpUnknown
 		lastLine := ""
-		fmt.Printf("number of pods %d\n", len(ti.PodList))
 		for allPodsComplete == false {
 			podIdx := 0
 			run := func(podIdx int, wg *sync.WaitGroup) {
 				for podStep[podIdx] < len(ti.ScriptLines) {
 
 					scrIdx := podStep[podIdx]
-					//					if scrIdx+1 == len(ti.ScriptLines) {
-					//						fmt.Printf("FINAL Pod %d State %d, Seq %d\n", podIdx, scrIdx, len(ti.ScriptLines))
-					//					}
 					podName := ti.PodList[podIdx].PodName
 					line := ""
 					operation := OpUnknown
@@ -338,7 +332,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 						}
 						podStep[podIdx] += 1
 					case OpUnknown:
-						fmt.Println("#Unknown operation #%d: skipping\n", scrIdx)
+						fmt.Printf("# Unknown operation #%d: skipping - %s\n", scrIdx, ti.ScriptLines[podStep[podIdx]])
 						podStep[podIdx] += 1
 					}
 				}
@@ -359,7 +353,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 				for i := 0; i < len(windows); i++ {
 					windows[i].Kill()
 				}
-				fmt.Println("windows within session terminated")
+				fmt.Println("# windows within session terminated")
 			case OpAttach:
 				fmt.Println("#ATTACH")
 				opts := gotmux.AttachSessionOptions{}
@@ -406,11 +400,11 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
 	podName := ti.PodList[podListIndex].PodName
 	original := ti.ScriptLines[scriptLineIndex]
 	var line string
-	if original[:5] == "{{OP_" {
+	if len(original) > 5 && original[:5] == "{{OP_" {
 		line = OpLineTagToString(original)
 	} else {
 		line = ExpandShortcuts(original, ti.Shorts)
-		line = ExpandK8s(line, ti.K8sContext, ti.K8sNamespace, podName)
+		line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
 		line = ExpandPodConverter(line, podName, ti.PodCs)
 	}
 	fmt.Printf("%s %d %d %s\n", podName, podListIndex, scriptLineIndex, line)
@@ -420,11 +414,12 @@ func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string 
 	podName := ti.PodList[podListIndex].PodName
 	original := ti.ScriptLines[scriptLineIndex]
 	var line string
-	if original[:5] == "{{OP_" {
+       
+	if len(original) > 5 && original[:5] == "{{OP_" {
 		line = OpLineTagToString(original)
 	} else {
 		line = ExpandShortcuts(original, ti.Shorts)
-		line = ExpandK8s(line, ti.K8sContext, ti.K8sNamespace, podName)
+		line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
 		line = ExpandPodConverter(line, podName, ti.PodCs)
 	}
 	return line

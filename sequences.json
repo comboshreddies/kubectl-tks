@@ -1,12 +1,8 @@
-
 {
-"internal": {
-    "control": [ "OP_INFO", "OP_COMMENT", "OP_NO_RETURN", "OP_FINAL_EXEC", "OP_ATTACH", "OP_TERMINATE", "OP_SLEEP", "OP_REFRESH_PROMPT" ],
-    "kctl": [ "k8s_config", "k8s_context", "k8s_namespace", "k8s_pod" ]
-},
 "podConverter" : {
     "p2c" : {
         "busybox" : "busybox.*",
+        "nginx" : "nginx.*",
         "main" : ".*"
         },
    "p2cLogs" : {
@@ -16,6 +12,14 @@
 },
 "shortcuts" : {
   "KCTL" : "kubectl --context {{k8s_context}} -n {{k8s_namespace}}",
+  "K" : "kubectl ",
+  "KN" : "kubectl -n {{k8s_namespace}}",
+  "KCN" : "kubectl --context {{k8s_context}} -n {{k8s_namespace}}",
+  "KNE" : "{{KN}} exec {{k8s_pod}} ",
+  "KCNE" : "{{KCN}} exec {{k8s_pod}}",
+  "KNEC" : "{{KNE}} -c {{p2c}} ",
+  "KCNEC" : "{{KCNE}} -c {{p2c}}",
+  "KCNEC-" : "{{KCNE}} -c {{p2c}} -- ",
   "KCTL_EXEC" : "{{KCTL}} exec {{k8s_pod}} -c {{p2c}} -- ",
   "KCTL_EXEC_BASH" : "{{KCTL}} exec {{k8s_pod}} -c {{p2c}} -- /bin/bash -c ",
   "KCTL_EXEC_IT" : "{{KCTL}} exec -it {{k8s_pod}} -c {{p2c}} -- ",
@@ -30,30 +34,17 @@
         "{{OP_COMMENT}} all logic is within a script",
         "custom.sh {{k8s_context}} {{k8s_namespace}} {{k8s_pod}} {{p2c}}"
     ],
-    "test": [
-        "{{OP_INFO}} test no kubectl",
-        "echo {{k8s_context}} {{k8s_namespace}}",
-        "{{OP_COMMENT}} test comment",
-        "echo {{k8s_context}} {{k8s_namespace}}",
-        "echo {{k8s_context}} {{k8s_namespace}}"
+   "env-nginx-simple": [
+        "{{OP_INFO}} execute env on each pod and put to pod.env file",
+        "kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c nginx  -- env > {{k8s_pod}}.env",
+        "cat {{k8s_pod}}.env"
     ],
-    "test2": [
-        "{{OP_INFO}} test no kubectl",
-        "ABCD=abcd",
-        "{{OP_SLEEP}} 3",
-        "echo $ABCD",
-        "echo {{k8s_context}} {{k8s_namespace}} {{p2cLogs}}",
-        "SLEEPTIME=$(($RANDOM % 60))",
-        "echo $SLEEPTIME",
-        "sleep $SLEEPTIME",
-        "{{OP_NO_RETURN}}",
-        "echo {{k8s_context}} {{k8s_namespace}} {{p2c}}",
-        "export PS1='abcd $ '",
-        "{{OP_REFRESH_PROMPT}}",
-        "echo {{k8s_context}} {{k8s_namespace}}",
-        "{{OP_FINAL_EXEC}} echo done > /tmp/x"
+    "env-nginx-simple-t": [
+        "{{OP_INFO}} execute env on each pod and put to pod.env file, terminate tmux",
+        "kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c nginx  -- env > {{k8s_pod}}.env",
+        "cat {{k8s_pod}}.env",
+        "{{OP_TERMINATE}}"
     ],
- 
     "env": [
         "{{OP_INFO}} execute env on each pod and put to pod.env file",
         "{{KCTL_EXEC}} env > {{k8s_pod}}.env"
@@ -156,19 +147,19 @@
     "kctl-exec-it-bash": [
         "{{OP_INFO}} execute bash on each pod in interactive mode and attach to tmux",
         "{{KCTL_EXEC_IT}} /bin/bash",
-        "{{OP_NO_RETURN}}",
+        "{{OP_NO_PROMPT_WAIT}}",
         "{{DO_ATTACH}}"
     ],
     "kctl-exec-sh": [
         "{{OP_INFO}} execute sh on each pod in interactive mode and attach to tmux",
         "{{KCTL_EXEC_IT}} /bin/sh",
-        "{{OP_NO_RETURN}}",
+        "{{OP_NO_PROMPT_WAIT}}",
         "{{OP_COMMENT}} no return after a command instructs not to wait for locally fetched prompt",
         "{{OP_COMMENT}} so next line is executed/sent to kubectl shell",
         "env",
-        "{{OP_NO_RETURN}}",
+        "{{OP_NO_PROMPT_WAIT}}",
         "date",
-        "{{OP_NO_RETURN}}",
+        "{{OP_NO_PROMPT_WAIT}}",
         "{{OP_SLEEP}} 4",
         "date",
         "{{OP_COMMENT}} in kubectl exec we have new prompt different than one on local machine",
@@ -182,25 +173,48 @@
     "exec-it-sh": [
         "{{OP_INFO}} execute sh on each pod in interactive mode and attach to tmux",
         "{{KCTL_EXEC_IT}} /bin/sh",
-        "{{OP_NO_RETURN}}",
+        "{{OP_NO_PROMPT_WAIT}}",
         "{{DO_ATTACH}}"
     ],
     "logs1": [
         "{{OP_INFO}} execute kubectl logs on each pod/container, pass it to local file then tail all files to console",
         "{{KCTL_LOGS1}} > {{k8s_namespace}}_logs_{{k8s_pod}}_{p2c}.log",
-        "{{OP_NO_RETURN}}",
-        "{{OP_FINAL_EXEC}} tail -f -q {{k8s_namespace}}_logs_*"
+        "{{OP_NO_PROMPT_WAIT}}",
+        "{{OP_FINALLY}} tail -f -q {{k8s_namespace}}_logs_*"
     ],
     "logs2": [
         "{{OP_INFO}} execute kubectl logs on each pod/container, pass it to local file then tail all files to console",
         "{{KCTL_LOGS2}} > {{k8s_namespace}}_logs_{{k8s_pod}}_{p2cLog}.log",
-        "{{OP_NO_RETURN}}",
-        "{{OP_FINAL_EXEC}} tail -f -q {{k8s_namespace}}_logs_*"
+        "{{OP_NO_PROMPT_WAIT}",
+        "{{OP_FINALLY}} tail -f -q {{k8s_namespace}}_logs_*"
     ],
     "dry": [
         "{{OP_INFO}} just echo {{k8s_context}} {{k8s_namespace}} {{k8s_pod}} and {{p2c}} values",
         "echo \"ctx {{k8s_context}} ns {{k8s_namespace}} pod {{k8s_pod}} co {{p2c}}\" ",
         "{{DO_ATTACH}}"
+    ],
+    "test": [
+        "{{OP_INFO}} test no kubectl",
+        "echo {{k8s_context}} {{k8s_namespace}}",
+        "{{OP_COMMENT}} test comment",
+        "echo {{k8s_context}} {{k8s_namespace}}",
+        "echo {{k8s_context}} {{k8s_namespace}}"
+    ],
+    "test2": [
+        "{{OP_INFO}} test no kubectl",
+        "ABCD=abcd",
+        "{{OP_SLEEP}} 3",
+        "echo $ABCD",
+        "echo {{k8s_context}} {{k8s_namespace}} {{p2cLogs}}",
+        "SLEEPTIME=$(($RANDOM % 60))",
+        "echo $SLEEPTIME",
+        "sleep $SLEEPTIME",
+        "{{OP_NO_PROMPT_WAIT}}",
+        "echo {{k8s_context}} {{k8s_namespace}} {{p2c}}",
+        "export PS1='abcd $ '",
+        "{{OP_REFRESH_PROMPT}}",
+        "echo {{k8s_context}} {{k8s_namespace}}",
+        "{{OP_FINALLY}} echo done > /tmp/x"
     ]
   } 
 }

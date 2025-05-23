@@ -62,7 +62,7 @@ func processList(cmd *cobra.Command, args []string) {
 
 	var keys []string
 	if args[0] == "scripts" {
-		for i:= 0; i<len(seq.Scripts); i++ {
+		for i := 0; i < len(seq.Scripts); i++ {
 			var help string
 			if len(seq.Scripts[i].Items) > 1 && strings.HasPrefix(seq.Scripts[i].Items[0], "{{OP_INFO}}") {
 				help = fmt.Sprintf("  %s  : %s", seq.Scripts[i].Name, seq.Scripts[i].Items[0][len("{{PO_INFO}}"):])
@@ -78,16 +78,19 @@ func processList(cmd *cobra.Command, args []string) {
 		}
 	}
 	if args[0] == "shortcuts" {
-		for i := 0; i < len(seq.Shorts); i++ {
-			fmt.Printf("%s : %s\n", seq.Shorts[i].Name, seq.Shorts[i].Value)
+		for i := 0; i < len(seq.ShortsKeys); i++ {
+			key := seq.ShortsKeys[i]
+			value := seq.Shorts[key]
+			fmt.Printf("%s : %s\n", key, value)
 		}
 	}
 	if args[0] == "podConverter" {
 		for i := 0; i < len(seq.PodCs); i++ {
 			fmt.Printf("%s :\n", seq.PodCs[i].Name)
-                        for j:= 0 ; j < len(seq.PodCs[i].Rules) ; j++ {
-                           fmt.Printf("  '%s' <- '%s'\n",seq.PodCs[i].Rules[j].Name,seq.PodCs[i].Rules[j].Regexp)
-                        }
+			for j := 0; j < len(seq.PodCs[i].Keys); j++ {
+				k := seq.PodCs[i].Keys[j]
+				fmt.Printf("  '%s' <- '%s'\n", k, seq.PodCs[i].Rules[k])
+			}
 		}
 	}
 }

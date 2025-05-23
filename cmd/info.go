@@ -50,7 +50,7 @@ func processInfo(cmd *cobra.Command, args []string) {
 					fmt.Printf(internal.OpLineTagToString(item))
 				} else {
 					if o.ExpandSeq {
-						newItem := internal.ExpandShortcuts(item, seq.Shorts)
+						newItem := internal.ExpandShortcuts(item, seq.Shorts, seq.ShortsKeys)
 						fmt.Printf("Origial: %s\n", item)
 						fmt.Printf("Expanded: %s\n", newItem)
 					} else {

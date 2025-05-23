@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -15,27 +16,17 @@ type scriptItem struct {
 	Items []string
 }
 
-// map ?
-type shortcuts struct {
-	Name  string
-	Value string
-}
-
 type podConverter struct {
 	Name  string
-	Rules []p2cRule
-}
-
-// map ?
-type p2cRule struct {
-	Name   string
-	Regexp string
+	Keys  []string
+	Rules map[string]string
 }
 
 type SequenceConfig struct {
-	PodCs   []podConverter
-	Shorts  []shortcuts
-	Scripts []scriptItem
+	PodCs      []podConverter
+	Shorts     map[string]string
+	ShortsKeys []string
+	Scripts    []scriptItem
 }
 
 func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
@@ -61,22 +52,22 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 			for key1, val1 := range val.(map[string]interface{}) {
 				var x podConverter
 				x.Name = key1
+				x.Rules = make(map[string]string)
 				for key2, val2 := range val1.(map[string]interface{}) {
-					var t p2cRule
-					t.Name = key2
-					t.Regexp = val2.(string)
-					x.Rules = append(x.Rules, t)
+					x.Keys = append(x.Keys, key2)
+					x.Rules[key2] = val2.(string)
 				}
 				seq.PodCs = append(seq.PodCs, x)
 			}
 		}
 		if key == "shortcuts" {
+			seq.Shorts = make(map[string]string)
 			for key1, val1 := range val.(map[string]interface{}) {
-				var t shortcuts
-				t.Name = key1
-				t.Value = val1.(string)
-				seq.Shorts = append(seq.Shorts, t)
+				fmt.Println(key1, val1)
+				seq.ShortsKeys = append(seq.ShortsKeys, key1)
+				seq.Shorts[key1] = val1.(string)
 			}
+			slices.Sort(seq.ShortsKeys)
 		}
 		if key == "scripts" {
 			var t scriptItem
@@ -101,14 +92,14 @@ func OpLineTagToOpString(line string) (print, operation string) {
 		return ret_print, ret_operation
 	}
 	check_operation := strings.Split(line[2:], "}}")[0]
-	for i:=0; i < len(SupportedOps); i++ {
-		if  OpInstruction[SupportedOps[i]] == check_operation {
+	for i := 0; i < len(SupportedOps); i++ {
+		if OpInstruction[SupportedOps[i]] == check_operation {
 			ret_print = check_operation[3:]
-			ret_operation = OpInstruction[SupportedOps[i]] 
-                        break
+			ret_operation = OpInstruction[SupportedOps[i]]
+			break
 		}
 	}
-        // fmt.Println("_ ",ret_print, ret_operation)
+	// fmt.Println("_ ",ret_print, ret_operation)
 	return ret_print, ret_operation
 }
 
@@ -117,12 +108,14 @@ func OpLineTagToString(line string) string {
 	return fmt.Sprintf("#%s:%s", to_print, line[len(operation)+4:])
 }
 
-func ExpandShortcuts(line string, shorts []shortcuts) string {
+func ExpandShortcuts(line string, shorts map[string]string, keys []string) string {
 	newLine := line
 	for l := 0; l < 100; l++ {
 		changes := false
-		for k := range shorts {
-			after := strings.Replace(newLine, "{{"+shorts[k].Name+"}}", shorts[k].Value, 10)
+		for i := 0; i < len(keys); i++ {
+			key := keys[i]
+			value := shorts[key]
+			after := strings.Replace(newLine, "{{"+key+"}}", value, 10)
 			if after != newLine {
 				changes = true
 				newLine = after
@@ -154,18 +147,18 @@ func ExpandK8s(line, K8sConfig, K8sContext, K8sNamespace, K8sPod string) string 
 	return newLine
 }
 
-func ExpandP2cRule(rules []p2cRule, pod string) string {
-	for i := 0; i < len(rules); i++ {
+func ExpandP2cRule(rules map[string]string, keys []string, pod string) string {
+	for i := 0; i < len(keys); i++ {
 		var err error = nil
 		matched := false
-		matched, err = regexp.Match(rules[i].Regexp, []byte(pod))
+		matched, err = regexp.Match(rules[keys[i]], []byte(pod))
 		if err != nil {
 			fmt.Println("Non fatal Error, failed in compiling p2c rules")
 			fmt.Println(err)
 			continue
 		}
 		if matched {
-			return rules[i].Name
+			return keys[i]
 		}
 	}
 	return "default"
@@ -176,7 +169,7 @@ func ExpandPodConverter(line, K8s_pod string, p2c []podConverter) string {
 	for l := 0; l < 100; l++ {
 		changes := false
 		for k := range p2c {
-			after := strings.Replace(newLine, "{{"+p2c[k].Name+"}}", ExpandP2cRule(p2c[k].Rules, K8s_pod), 10)
+			after := strings.Replace(newLine, "{{"+p2c[k].Name+"}}", ExpandP2cRule(p2c[k].Rules, p2c[k].Keys, K8s_pod), 10)
 			if after != newLine {
 				changes = true
 				newLine = after
@@ -314,6 +307,6 @@ func opDecode(inputLine string) (op OpDecoded, line string) {
 			return OpRefreshPrompt, ""
 		}
 		return OpUnknown, ""
-        }
+	}
 	return OpExecute, inputLine
 }

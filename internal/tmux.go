@@ -17,7 +17,8 @@ type TmuxInData struct {
 	K8sContext   string
 	K8sNamespace string
 	PodList      []PodsInfo
-	Shorts       []shortcuts
+	Shorts       map[string]string
+	ShortsKeys   []string
 	PodCs        []podConverter
 	Prompt       string
 	PromptSleep  int
@@ -195,7 +196,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 					}
 				}
 			case OpUnknown:
-				fmt.Printf("# Unknown operation, skipping - %s\n",ti.ScriptLines[scrIdx])
+				fmt.Printf("# Unknown operation, skipping - %s\n", ti.ScriptLines[scrIdx])
 			}
 			switch operation {
 			case OpTerminate:
@@ -281,6 +282,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 							if err != nil {
 								fmt.Println(err)
 								finalOp[podIdx] = OpUnknown
+								podStep[podIdx] = len(ti.ScriptLines)
 								break
 							}
 							executionSent[podIdx][scrIdx] = true
@@ -328,6 +330,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 						if err != nil {
 							fmt.Println("error in fetching pane prompt")
 							finalOp[podIdx] = OpUnknown
+							podStep[podIdx] = len(ti.ScriptLines)
 							break
 						}
 						podStep[podIdx] += 1
@@ -403,7 +406,7 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
 	if len(original) > 5 && original[:5] == "{{OP_" {
 		line = OpLineTagToString(original)
 	} else {
-		line = ExpandShortcuts(original, ti.Shorts)
+		line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
 		line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
 		line = ExpandPodConverter(line, podName, ti.PodCs)
 	}
@@ -414,11 +417,11 @@ func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string 
 	podName := ti.PodList[podListIndex].PodName
 	original := ti.ScriptLines[scriptLineIndex]
 	var line string
-       
+
 	if len(original) > 5 && original[:5] == "{{OP_" {
 		line = OpLineTagToString(original)
 	} else {
-		line = ExpandShortcuts(original, ti.Shorts)
+		line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
 		line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
 		line = ExpandPodConverter(line, podName, ti.PodCs)
 	}

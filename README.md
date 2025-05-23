@@ -376,19 +376,21 @@ nginx-sample1-6475dd48b7-n6mtg 2 0 kubectl -n test-run exec -t nginx-sample1-647
 
 # FAQ
  
-Q: What kubernetes arguments can be used ?
+## Q: What kubernetes arguments can be used ?
 A: k8s_config, k8s_context, k8s_namespace, k8s_pod
+```console
 $ kubectl tks list kctl
 Kubectl params:
  k8s_config
  k8s_context
  k8s_namespace
  k8s_pod
+```
 
 
-
-Q: What other OP_ commands are available ?
+## Q: What other OP_ commands are available ?
 A: 
+```console
 $ kubectl tks list control
 Controls:
  OP_TERMINATE - Terminate tmux, script end
@@ -401,17 +403,19 @@ Controls:
  OP_NO_PROMPT_WAIT - Do not wait for prompt for last command
  OP_SLEEP - Sleep for n seconds
  OP_REFRESH_PROMPT - Load new prompt
+```
 
-
-
-Q:kubectl tks -n test-run start -l app=nginx  "kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c nginx -- env;echo {{k8s_pod}}" -T How to use same execution line for different pods container names, ie when -c container_name is not same ?
+## Q: How to use same execution line for different pods container names, ie when -c container_name is not same ?
 A: use podConverter section of sequences.json file (~/.tks/sequences.json)
+```console
 "podConverter" : {
     "p2c" : {
         "busybox" : "busybox.*",
         "nginx" : "nginx.*",
         "main" : ".*"
         },
+```
+
 then use {{p2c}} in kubectl command line.
 You can have more than one item, so if you need different pod name to container mapper define
 different set of rules.

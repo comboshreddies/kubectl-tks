@@ -49,7 +49,7 @@ One can easily make a a shell script to execute some command on each pod/contain
 Executing on more than few pods might fail on some pods. Having output of many pod executions on one screen is not practical. You might need to take a look at each execution on your own, one pod at the time. You might want to keep terminal session for each pod that you've connected to. Using tmux could help.
 
 
-#intro
+# intro
 
 To practice first steps create a deployment
 

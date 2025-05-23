@@ -63,7 +63,6 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 		if key == "shortcuts" {
 			seq.Shorts = make(map[string]string)
 			for key1, val1 := range val.(map[string]interface{}) {
-				fmt.Println(key1, val1)
 				seq.ShortsKeys = append(seq.ShortsKeys, key1)
 				seq.Shorts[key1] = val1.(string)
 			}
@@ -99,7 +98,6 @@ func OpLineTagToOpString(line string) (print, operation string) {
 			break
 		}
 	}
-	// fmt.Println("_ ",ret_print, ret_operation)
 	return ret_print, ret_operation
 }
 

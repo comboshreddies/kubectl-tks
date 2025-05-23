@@ -376,7 +376,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 func tmux_get_pane_prompt(window *gotmux.Window) (prompt string, err error) {
 	pane, err := window.GetPaneByIndex(0)
 	if err != nil {
-		fmt.Println("error get window")
+		fmt.Println("error get window - get prompt")
 		return "", err
 	}
 
@@ -444,7 +444,7 @@ func dryRunPrintOut(ti TmuxInData, syncExec bool) {
 func windowsSendKeys(window *gotmux.Window, line string) error {
 	pane, err := window.GetPaneByIndex(0)
 	if err != nil {
-		fmt.Println("error get window")
+		fmt.Println("error get window - send keys")
 		return err
 	}
 

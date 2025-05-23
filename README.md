@@ -385,6 +385,22 @@ OP_NO_PROMPT_WAIT, tks will not wait for prompt to return, it will start executi
 
 There are cases where prompt changes, for example if you  kubectl exec to remote pod you will get prompt from pod.
 Usually that prompt is pod name, but it can be anything. In such cases, in order to continue, and not to wait for prompt that was initially loaded (local host prompt) there is OP_REFRESH_PROMPT, this command will read prompt again.
+For example:
+```console
+    "remote-exec": [
+        "kubectl --context {{k8s_context}} -n {{k8s_namespace}} exec -it {{k8s_pod}} -c {{p2c}} -- /bin/bash",
+        "{{OP_NO_PROMPT_WAIT}}",
+        "{{OP_REFRESH_PROMPT}}",
+        "sleep 20",
+        "sleep 10",
+        "hostname",
+        "exit",
+        "{{OP_NO_PROMPT_WAIT}}",
+        "{{OP_REFRESH_PROMPT}}",
+        "hostname"
+    ]
+```
+this example will execute kubectl, but will not wait for prompt, it will load new prompt, then will execute remote (kubectl pod/container) sleep 20 (will wait for prompt), then sleep 10 (will wait for prompt), then it will exit without waiting for prompt, then it will load prompt again (as after exit we are back in local shell),  
 
 There are cases where you might benefit from some sleep time, so there is OP_SLEEP, this command have an argument
 ```console

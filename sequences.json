@@ -216,6 +216,18 @@
         "{{OP_REFRESH_PROMPT}}",
         "echo {{k8s_context}} {{k8s_namespace}}",
         "{{OP_FINALLY}} echo done > /tmp/x"
+    ],
+    "remote-exec": [
+        "kubectl --context {{k8s_context}} -n {{k8s_namespace}} exec -it {{k8s_pod}} -c {{p2c}} -- /bin/bash",
+        "{{OP_NO_PROMPT_WAIT}}",
+        "{{OP_REFRESH_PROMPT}}",
+        "sleep 20",
+        "sleep 10",
+        "hostname",
+        "exit",
+        "{{OP_NO_PROMPT_WAIT}}",
+        "{{OP_REFRESH_PROMPT}}",
+        "hostname"
     ]
   } 
 }

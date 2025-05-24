@@ -137,6 +137,10 @@ func ExpandK8s(line, K8sConfig, K8sContext, K8sNamespace, K8sPod string) string 
 		after = strings.Replace(after, "{{k8s_context}}", K8sContext, 10)
 		after = strings.Replace(after, "{{k8s_namespace}}", K8sNamespace, 10)
 		after = strings.Replace(after, "{{k8s_pod}}", K8sPod, 10)
+		after = strings.Replace(after, "{{cnf}}", K8sConfig, 10)
+		after = strings.Replace(after, "{{ctx}}", K8sContext, 10)
+		after = strings.Replace(after, "{{nsp}}", K8sNamespace, 10)
+		after = strings.Replace(after, "{{pod}}", K8sPod, 10)
 		if after != newLine {
 			changes = true
 			newLine = after
@@ -211,11 +215,18 @@ const (
 
 var SupportedKctl = []KctlDecode{KctlConfig, KctlContext, KctlNamespace, KctlPod}
 
-var KctlVariables = map[KctlDecode]string{
+var KctlLong = map[KctlDecode]string{
 	KctlConfig:    "k8s_config",
 	KctlContext:   "k8s_context",
 	KctlNamespace: "k8s_namespace",
 	KctlPod:       "k8s_pod",
+}
+
+var KctlShort = map[KctlDecode]string{
+	KctlConfig:    "cnf",
+	KctlContext:   "ctx",
+	KctlNamespace: "nsp",
+	KctlPod:       "pod",
 }
 
 type OpDecoded int

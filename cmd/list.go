@@ -32,7 +32,7 @@ func processList(cmd *cobra.Command, args []string) {
 	if args[0] == "kctl" {
 		fmt.Printf("Kubectl params:\n")
 		for i := 0; i < len(internal.SupportedKctl); i++ {
-			fmt.Printf(" %s\n", internal.KctlVariables[internal.SupportedKctl[i]])
+			fmt.Printf(" %s or short %s\n", internal.KctlLong[internal.SupportedKctl[i]], internal.KctlShort[internal.SupportedKctl[i]])
 		}
 		return
 	}

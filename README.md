@@ -167,7 +167,7 @@ $ kubectl tks -n test-run start -l app=nginx  "kubectl -n {{nsp}} exec -t {{pod}
 
 ## one-liner with dry run mode
 
-You can always run command in dry-run mode with -d flag, only output will be printed, but templated fields will encoded. Table shows podname, pod number, script line number, then command that would have been executed
+You can always run command in dry-run mode with -d flag, only output will be printed, but templated fields are resolved. Table shows podname, pod number, script line number, then command that would have been executed
 
 ```console
 $ kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- env" -d

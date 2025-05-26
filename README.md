@@ -37,9 +37,9 @@ go to the next pod window.
 ## Installation
 
 1) go build
-2) copy kubectl-tks to your path
+2) copy kubectl-tks to your bin path (/usr/local/bin for example)
 
-Additionally, but can be done later
+Additional step, not needed but useful, can be done later
 3) mkdir  ~/.tks
 4) copy sequences.json to ~/.tks/
 
@@ -76,7 +76,9 @@ One-liner example is nice way to start but real power comes with scripts that ar
 
 Let's run simple one-liner
 ```console
-$ kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- env"
+kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- env"
+```
+```
 # Unable to read conf file /Users/none/.tks/sequences.json, assuming oneLiner
 # unable to open sequence json file /Users/none/.tks/sequences.json
 #### Creating new session OneLiner--test-run

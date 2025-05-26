@@ -1,6 +1,6 @@
 ##   Tmux Kubectl Scripts - tks
 # tks kubectl plugin - or standalone tool
-## A plugin for executing scripts on pods within:
+## A plugin for executing scripts on pods within tmux windows:
 
 Tks plugin runs multiple execution scripts (sequences) in multiple tmux windows.
 Each window runs a script on one pod. You can decide if you want to attach and inspect

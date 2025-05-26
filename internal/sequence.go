@@ -88,8 +88,8 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 }
 
 func OpLineTagToOpString(line string) (op OpDecoded, opLine string) {
-	retOperation := OpUnknown
-	retLine := ""
+	retOperation := OpExecute
+	retLine := line
 
 	// checking shortened operations
 	if len(line) >= 6 && line[:3] == "{{_" {
@@ -119,6 +119,7 @@ func OpLineTagToOpString(line string) (op OpDecoded, opLine string) {
 			}
 		}
 	}
+
 	return retOperation, retLine
 }
 
@@ -349,7 +350,11 @@ var OpName = map[OpDecoded]string{
 func opDecode(inputLine string) (op OpDecoded, line string) {
 	if len(inputLine) > 5 && inputLine[:2] == "{{" {
 		op, line = OpLineTagToString(inputLine)
-		return op, line
+		if op == OpUnknown {
+			return OpExecute, line
+		} else {
+			return op, line
+		}
 	}
 	return OpExecute, inputLine
 }

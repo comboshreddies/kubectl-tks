@@ -363,23 +363,10 @@ you can list available shortcuts
 kubectl tks list shortcuts
 ```
 ```
-K - kubectl
-KN - {{K}} -n {{k8s_namespace}}
-KNE - {{KN}} exec {{k8s_pod}}
-KNEC - {{KNE}} -c {{p2c}}
-KNEC- - {{KNEC}} --
-KCN - kubectl --context {{k8s_context}} -n {{k8s_namespace}}
-KCNE - {{KCN}} exec {{k8s_pod}}
-KCNEC - {{KCNE}} -c {{p2c}}
-KCNEC- - {{KCNE}} -c {{p2c}} --
-KCTL - kubectl --context {{k8s_context}} -n {{k8s_namespace}}
-KCTL_EXEC - {{KCTL}} exec {{k8s_pod}} -c {{p2c}} --
-KCTL_EXEC_IT - {{KCTL}} exec -it {{k8s_pod}} -c {{p2c}} --
-KCTL_EXEC_IT_BASH - {{KCTL}} exec -it {{k8s_pod}} -c {{p2c}} -- /bin/bash -c
-KCTL_LOGS_SWITCHES -  --prefix --timestamps --max-log-requests 100
-KCTL_LOGS1 - {{KCTL}} logs -f {{KCTL_LOGS_SWITCHES}} {{k8s_pod}} -c {{p2c}}
-KCTL_LOGS2 - {{KCTL}} logs -f {{KCTL_LOGS_SWITCHES}} {{k8s_pod}} -c {{p2cLog}}
-KCTL_EXEC_BASH - {{KCTL}} exec {{k8s_pod}} -c {{p2c}} -- /bin/bash -c
+EC : _ exec {{pod}} -c {{p2c}} --
+ECV : {{EC}} /bin/bash -c
+KCTL_LOGS_SWITCHES :  --prefix --timestamps --max-log-requests 100
+LC : _ logs -f {{KCTL_LOGS_SWITCHES}} {{pod}} -c {{p2cLog}}
 ```
 
 

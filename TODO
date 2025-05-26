@@ -12,3 +12,5 @@ In k8s.go consider senting containers name list []string, currently not needed
 OP_RECORD (each pod window capture in file per pod)
 
 Check timings check, make different ctrl+c or ctrl+\ (detach/terminate)
+
+expand shortcuts in info

@@ -405,14 +405,14 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
 	var op OpDecoded
 	if len(original) > 5 && original[:2] == "{{" {
 		op, line = OpLineTagToString(original)
-		original = fmt.Sprintf("#%s: %s", OpInstruction[op], line)
+		original = line
 	}
 	line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
 	line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)
 	line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
 	line = ExpandPodConverter(line, podName, ti.PodCs)
 
-	fmt.Printf("%s %d %d %s\n", podName, podListIndex, scriptLineIndex, line)
+	fmt.Printf("%s %d %d (%s) %s\n", podName, podListIndex, scriptLineIndex, OpInstruction[op], line)
 }
 
 func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string {

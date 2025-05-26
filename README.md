@@ -189,6 +189,8 @@ $ kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- en
 
 Now at the end of execution tks will attach the tmux session it created. 
 There are more OP_ commands available, you can find more in question section Q: What other OP_ commands are available ?
+Once you learn what operations are available and what they stand for, you can use also shortened operations.
+In this case you could use {{_A}} as a short version of a {{OP_ATTACH}}.
 
 
 ## using sequence file for storing complex scripts

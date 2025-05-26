@@ -276,14 +276,17 @@ kubectl tks list scripts
 
 ```
 you will get list of scripts with their info, list will show scripts that are available in sequence.json file
+If you want to use some other sequence.json config file you can always use -f other_sequence_file.json 
+For example I do have separate sequence.json for apt-based containers, and separate for yum-based containers.
 
-If you want to use some other sequence.json config file you can always use -f other_sequence_file.json do:
+
+For more details on what can be listed (beside scripts), do:
 ```console
 kubectl tks list
 Usage:
   kubect-tks list [scripts|shortcuts|podConverter|control|kctl] [flags]
 ```
-for more details on what can be listed.
+
 
 Up to now we have seen following OP_ commands:
 OP_INFO line is used as information printed when tks list scripts is called

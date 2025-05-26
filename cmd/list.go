@@ -40,7 +40,7 @@ func processList(cmd *cobra.Command, args []string) {
 	if args[0] == "control" {
 		fmt.Printf("Controls:\n")
 		for i := 0; i < len(internal.SupportedOps); i++ {
-			fmt.Printf(" %s - %s\n", internal.OpInstruction[internal.SupportedOps[i]], internal.OpName[internal.SupportedOps[i]])
+			fmt.Printf(" %s - %s - %s\n", internal.OpInstruction[internal.SupportedOps[i]], internal.OpShort[internal.SupportedOps[i]], internal.OpName[internal.SupportedOps[i]])
 		}
 		return
 	}

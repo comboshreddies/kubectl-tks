@@ -36,7 +36,6 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 	//	fmt.Println(dry, syncExec, delTxSess)
 	//	fmt.Println("------====----")
 
-	// place to define specific 2d iterator ?!?
 	if dry == true {
 		dryRunPrintOut(ti, syncExec)
 		return
@@ -403,14 +402,16 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
 	podName := ti.PodList[podListIndex].PodName
 	original := ti.ScriptLines[scriptLineIndex]
 	var line string
-	if len(original) > 5 && original[:5] == "{{OP_" {
-		line = OpLineTagToString(original)
-	} else {
-		line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
-                line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)
-		line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
-		line = ExpandPodConverter(line, podName, ti.PodCs)
+	var op OpDecoded
+	if len(original) > 5 && original[:2] == "{{" {
+		op, line = OpLineTagToString(original)
+		original = fmt.Sprintf("#%s: %s", OpInstruction[op], line)
 	}
+	line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
+	line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)
+	line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
+	line = ExpandPodConverter(line, podName, ti.PodCs)
+
 	fmt.Printf("%s %d %d %s\n", podName, podListIndex, scriptLineIndex, line)
 }
 
@@ -418,15 +419,16 @@ func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string 
 	podName := ti.PodList[podListIndex].PodName
 	original := ti.ScriptLines[scriptLineIndex]
 	var line string
-
+	var op OpDecoded
 	if len(original) > 5 && original[:5] == "{{OP_" {
-		line = OpLineTagToString(original)
-	} else {
-		line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
-                line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)
-		line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
-		line = ExpandPodConverter(line, podName, ti.PodCs)
+		// should not match, but if we do, put # shell comment
+		op, line = OpLineTagToString(original)
+		original = fmt.Sprintf("#%s: %s", OpInstruction[op], line)
 	}
+	line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
+	line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)
+	line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
+	line = ExpandPodConverter(line, podName, ti.PodCs)
 	return line
 }
 

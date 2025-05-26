@@ -87,26 +87,43 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 	return seq, nil
 }
 
-func OpLineTagToOpString(line string) (print, operation string) {
-	ret_print := "UNKNOWN_OPERATION"
-	ret_operation := "OP_UNKNOWN"
-	if len(line) > 7 && line[:5] != "{{OP_" {
-		return ret_print, ret_operation
-	}
-	check_operation := strings.Split(line[2:], "}}")[0]
-	for i := 0; i < len(SupportedOps); i++ {
-		if OpInstruction[SupportedOps[i]] == check_operation {
-			ret_print = check_operation[3:]
-			ret_operation = OpInstruction[SupportedOps[i]]
-			break
+func OpLineTagToOpString(line string) (op OpDecoded, opLine string) {
+	retOperation := OpUnknown
+	retLine := ""
+
+	// checking shortened operations
+	if len(line) >= 6 && line[:3] == "{{_" {
+		splitLine := strings.Split(line[2:], "}}")
+		if len(splitLine) > 1 {
+			check_operation := splitLine[0]
+			for i := 0; i < len(SupportedOps); i++ {
+				if OpShort[SupportedOps[i]] == check_operation {
+					retOperation = SupportedOps[i]
+					retLine = splitLine[1]
+					break
+				}
+			}
 		}
 	}
-	return ret_print, ret_operation
+	// checking full length operations
+	if len(line) > 7 && line[:5] == "{{OP_" {
+		splitLine := strings.Split(line[2:], "}}")
+		if len(splitLine) > 1 {
+			check_operation := splitLine[0]
+			for i := 0; i < len(SupportedOps); i++ {
+				if OpInstruction[SupportedOps[i]] == check_operation {
+					retOperation = SupportedOps[i]
+					retLine = splitLine[1]
+					break
+				}
+			}
+		}
+	}
+	return retOperation, retLine
 }
 
-func OpLineTagToString(line string) string {
-	to_print, operation := OpLineTagToOpString(line)
-	return fmt.Sprintf("#%s:%s", to_print, line[len(operation)+4:])
+func OpLineTagToString(line string) (op OpDecoded, outLine string) {
+	return OpLineTagToOpString(line)
 }
 
 func ExpandShortcuts(line string, shorts map[string]string, keys []string) string {
@@ -130,24 +147,24 @@ func ExpandShortcuts(line string, shorts map[string]string, keys []string) strin
 }
 
 func ExpandUnderscore(line, K8sConfig, K8sContext, K8sNamespace string) string {
-       newLine := "kubectl"
-       if K8sConfig != "" {
-           newLine += " --kubeconfig=" + K8sConfig
-       } 
-       if K8sContext != "" {
-           newLine += " --context=" + K8sContext 
-       }
-       if K8sNamespace != "" {
-           newLine += " -n " + K8sNamespace 
-       }
-     
-       if ( len(line) > 1 && line[:2] == "_ ") {
-             return newLine + line[1:]
-       }
-       if len(line) == 1 && line[:1] == "_" {
-             return newLine
-       }
-       return line
+	newLine := "kubectl"
+	if K8sConfig != "" {
+		newLine += " --kubeconfig=" + K8sConfig
+	}
+	if K8sContext != "" {
+		newLine += " --context=" + K8sContext
+	}
+	if K8sNamespace != "" {
+		newLine += " -n " + K8sNamespace
+	}
+
+	if len(line) > 1 && line[:2] == "_ " {
+		return newLine + line[1:]
+	}
+	if len(line) == 1 && line[:1] == "_" {
+		return newLine
+	}
+	return line
 }
 
 func ExpandK8s(line, K8sConfig, K8sContext, K8sNamespace, K8sPod string) string {
@@ -301,6 +318,20 @@ var OpPrint = map[OpDecoded]string{
 	OpUnknown:       "#OPeration_Uknown",
 }
 
+var OpShort = map[OpDecoded]string{
+	OpTerminate:     "_T",
+	OpAttach:        "_A",
+	OpDetach:        "_D",
+	OpFinally:       "_F",
+	OpExecute:       "_E",
+	OpInfo:          "_I",
+	OpComment:       "_C",
+	OpNoPrompt:      "_N",
+	OpSleep:         "_S",
+	OpRefreshPrompt: "_R",
+	OpUnknown:       "#OPeration_Uknown",
+}
+
 var OpName = map[OpDecoded]string{
 	OpTerminate:     "Terminate tmux, script end",
 	OpAttach:        "Attach tmux, script end",
@@ -316,36 +347,9 @@ var OpName = map[OpDecoded]string{
 }
 
 func opDecode(inputLine string) (op OpDecoded, line string) {
-	if len(inputLine) > 5 && inputLine[:5] == "{{OP_" {
-		line = OpLineTagToString(inputLine)
-		if len(line) >= 6 && line[:6] == "#INFO:" {
-			return OpInfo, line[6:]
-		}
-		if len(line) >= 9 && line[:9] == "#COMMENT:" {
-			return OpComment, line[9:]
-		}
-		if len(line) >= 7 && line[:7] == "#SLEEP:" {
-			return OpSleep, line[7:]
-		}
-		if len(line) >= 11 && line[:11] == "#TERMINATE:" {
-			return OpTerminate, ""
-		}
-		if len(line) >= 8 && line[:8] == "#ATTACH:" {
-			return OpAttach, ""
-		}
-		if len(line) >= 8 && line[:8] == "#DETACH:" {
-			return OpDetach, ""
-		}
-		if len(line) >= 9 && line[:9] == "#FINALLY:" {
-			return OpFinally, line[12:]
-		}
-		if len(line) >= 16 && line[:16] == "#NO_PROMPT_WAIT:" {
-			return OpNoPrompt, ""
-		}
-		if len(line) >= 16 && line[:16] == "#REFRESH_PROMPT:" {
-			return OpRefreshPrompt, ""
-		}
-		return OpUnknown, ""
+	if len(inputLine) > 5 && inputLine[:2] == "{{" {
+		op, line = OpLineTagToString(inputLine)
+		return op, line
 	}
 	return OpExecute, inputLine
 }

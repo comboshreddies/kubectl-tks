@@ -58,14 +58,17 @@ kubectl create ns test-run
 kubectl -n test-run apply -f k8s_yamls/sample_deploy1.yaml
 kubectl -n test-run get pod --show-labels
 ```
+
 ```
 NAME                             READY   STATUS    RESTARTS   AGE   LABELS
 nginx-sample1-6475dd48b7-bgtsx   1/1     Running   0          2m   app=nginx,pod-template-hash=6475dd48b7,ver=v1
 nginx-sample1-6475dd48b7-br6jc   1/1     Running   0          2m   app=nginx,pod-template-hash=6475dd48b7,ver=v1
 nginx-sample1-6475dd48b7-n6mtg   1/1     Running   0          2m   app=nginx,pod-template-hash=6475dd48b7,ver=v1
 ```
+
 ```console
-$ kubectl -n test-run get pod -l app=nginx
+kubectl -n test-run get pod -l app=nginx
+```
 ```
 NAME                             READY   STATUS    RESTARTS   AGE
 nginx-sample1-6475dd48b7-bgtsx   1/1     Running   0          2m 
@@ -561,7 +564,10 @@ different set of rules.
 
 here is an example of dry run showing how p2c converts podname to correct container name
 ```console
-$ kubectl tks -n test-run start "_ exec {{pod}} -c {{p2c}} -- env" -d
+kubectl tks -n test-run start "_ exec {{pod}} -c {{p2c}} -- env" -d
+```
+
+```
 #Sripts loaded from sequence.file
 #PodConverter loaded from sequence.file
 #Shortcuts loaded from sequence.file

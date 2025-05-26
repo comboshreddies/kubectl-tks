@@ -270,7 +270,7 @@ Feel free to adjust and modify sripts section to fit your needs.
 ### sequence.json - list available scripts
 You can check a list of available scripts within sequence.json like this
 ```console
-kubectl tks list scripts
+$ kubectl tks list scripts
 ...
 ...
 
@@ -282,7 +282,7 @@ For example I do have separate sequence.json for apt-based containers, and separ
 
 For more details on what can be listed (beside scripts), do:
 ```console
-kubectl tks list
+$ kubectl tks list
 Usage:
   kubect-tks list [scripts|shortcuts|podConverter|control|kctl] [flags]
 ```

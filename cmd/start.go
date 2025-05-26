@@ -12,7 +12,7 @@ import (
 
 func init() {
 	cmdStart.Flags().StringVarP(&o.ScriptFile, "scriptFile", "f", "", "scriptFile (default is $HOME/.tks/sequence.json)")
-	cmdStart.Flags().StringVarP(&o.K8sConfig, "config", "", "", "kubernetes config file")
+	cmdStart.Flags().StringVarP(&o.K8sConfig, "kubeconfig", "", "", "kubernetes config file")
 	cmdStart.Flags().StringVarP(&o.K8sContext, "context", "", "", "kubernetes context")
 	cmdStart.Flags().StringVarP(&o.K8sNamespace, "namespace", "n", "", "kubernetes namespace")
 	cmdStart.Flags().StringVarP(&o.K8sSelector, "selector", "l", "", "kubernetes label query selector")
@@ -62,8 +62,8 @@ func processStart(cmd *cobra.Command, args []string) {
 	if noConfFile == false {
 		seqOffset, err = internal.IsThereAScript(args[0], seq.Scripts)
 		if err != nil {
-			fmt.Printf("# No script %s in sequence file %s, assuming oneLiner\n", args[0], o.ScriptFile)
 			fmt.Println(err)
+			fmt.Printf("# assuming oneLiner\n")
 			noScript = true
 		}
 	}

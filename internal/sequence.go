@@ -129,6 +129,27 @@ func ExpandShortcuts(line string, shorts map[string]string, keys []string) strin
 	return newLine
 }
 
+func ExpandUnderscore(line, K8sConfig, K8sContext, K8sNamespace string) string {
+       newLine := "kubectl"
+       if K8sConfig != "" {
+           newLine += " --kubeconfig=" + K8sConfig
+       } 
+       if K8sContext != "" {
+           newLine += " --context=" + K8sContext 
+       }
+       if K8sNamespace != "" {
+           newLine += " -n " + K8sNamespace 
+       }
+     
+       if ( len(line) > 1 && line[:2] == "_ ") {
+             return newLine + line[1:]
+       }
+       if len(line) == 1 && line[:1] == "_" {
+             return newLine
+       }
+       return line
+}
+
 func ExpandK8s(line, K8sConfig, K8sContext, K8sNamespace, K8sPod string) string {
 	newLine := line
 	for l := 0; l < 100; l++ {
@@ -141,6 +162,11 @@ func ExpandK8s(line, K8sConfig, K8sContext, K8sNamespace, K8sPod string) string 
 		after = strings.Replace(after, "{{ctx}}", K8sContext, 10)
 		after = strings.Replace(after, "{{nsp}}", K8sNamespace, 10)
 		after = strings.Replace(after, "{{pod}}", K8sPod, 10)
+		after = strings.Replace(after, "{{cnf}}", K8sConfig, 10)
+		after = strings.Replace(after, "{{ctx}}", K8sContext, 10)
+		after = strings.Replace(after, "{{nsp}}", K8sNamespace, 10)
+		after = strings.Replace(after, "{{pod}}", K8sPod, 10)
+
 		if after != newLine {
 			changes = true
 			newLine = after

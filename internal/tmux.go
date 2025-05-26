@@ -407,6 +407,7 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
 		line = OpLineTagToString(original)
 	} else {
 		line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
+                line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)
 		line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
 		line = ExpandPodConverter(line, podName, ti.PodCs)
 	}
@@ -422,6 +423,7 @@ func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string 
 		line = OpLineTagToString(original)
 	} else {
 		line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
+                line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)
 		line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
 		line = ExpandPodConverter(line, podName, ti.PodCs)
 	}

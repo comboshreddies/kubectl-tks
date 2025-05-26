@@ -4,11 +4,12 @@ PROJECTNAME=$(shell basename "$(PWD)")
 
 BIN_FOLDER=bin
 
-BIN_FOLDER_MACOS=${BIN_FOLDER}/amd64/darwin
-BIN_FOLDER_LINUX=${BIN_FOLDER}/amd64/linux
-BIN_FOLDER_MACOS_ARM=${BIN_FOLDER}/arm64/darwin
-BIN_FOLDER_LINUX_ARM=${BIN_FOLDER}/arm64/linux
-BIN_FOLDER_SCRATCH=${BIN_FOLDER}/amd64/scratch
+AMD64=amd64
+ARM64=arm64
+MAC=darwin
+LINUX=linux
+BIN_FOLDER_AMD64=${BIN_FOLDER}/${AMD64}
+BIN_FOLDER_ARM64=${BIN_FOLDER}/${ARM64}
 BIN_NAME=${PROJECTNAME}
 
 MAKEFLAGS += --silent
@@ -31,14 +32,14 @@ build:
 		-o ${BIN_FOLDER}/${BIN_NAME} \
 		"${CLI_MAIN_FOLDER}"
 
-build-all: build-macos build-linux build-macos-arm build-linux-arm build-alpine-scratch
+build-all: build-macos build-linux build-macos-arm build-linux-arm
 
 build-macos:
 	@echo "  >  Building binary for MacOS"
 	@GOOS=darwin GOARCH=amd64 \
 		go build \
 		-ldflags="${LDFLAGS}" \
-		-o ${BIN_FOLDER_MACOS}/${BIN_NAME} \
+		-o ${BIN_FOLDER_AMD64}/${BIN_NAME}_${AMD64}_${MAC} \
 		"${CLI_MAIN_FOLDER}"
 
 build-linux:
@@ -46,7 +47,7 @@ build-linux:
 	@GOOS=linux GOARCH=amd64 \
 		go build \
 		-ldflags="${LDFLAGS}" \
-		-o ${BIN_FOLDER_LINUX}/${BIN_NAME} \
+		-o ${BIN_FOLDER_AMD64}/${BIN_NAME}_${AMD64}_${LINUX} \
 		"${CLI_MAIN_FOLDER}"
 
 build-macos-arm:
@@ -54,7 +55,7 @@ build-macos-arm:
 	@GOOS=darwin GOARCH=arm64 \
 		go build \
 		-ldflags="${LDFLAGS}" \
-		-o ${BIN_FOLDER_MACOS_ARM}/${BIN_NAME} \
+		-o ${BIN_FOLDER_ARM64}/${BIN_NAME}_${ARM64}_${MAC} \
 		"${CLI_MAIN_FOLDER}"
 
 build-linux-arm:
@@ -62,7 +63,7 @@ build-linux-arm:
 	@GOOS=linux GOARCH=arm64 \
 		go build \
 		-ldflags="${LDFLAGS}" \
-		-o ${BIN_FOLDER_LINUX_ARM}/${BIN_NAME} \
+		-o ${BIN_FOLDER_ARM64}/${BIN_NAME}_${ARM64}_${LINUX} \
 		"${CLI_MAIN_FOLDER}"
 
 
@@ -73,7 +74,7 @@ build-alpine-scratch:
 		go build \
 		-ldflags="${LDFLAGS}" \
 		-a -installsuffix cgo \
-		-o ${BIN_FOLDER_SCRATCH}/${BIN_NAME} \
+		-o ${BIN_FOLDER_AMD64}/${BIN_NAME}_alpine \
 		"${CLI_MAIN_FOLDER}"
 
 fmt:

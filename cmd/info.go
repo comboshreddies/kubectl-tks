@@ -47,8 +47,8 @@ func processInfo(cmd *cobra.Command, args []string) {
 				fmt.Printf("%d: \n", j)
 				item := seq.Scripts[i].Items[j]
 				if item[:5] == "{{OP_" {
-					_, line := internal.OpLineTagToString(item)
-					fmt.Printf("%s", line)
+					op, line := internal.OpLineTagToString(item)
+					fmt.Printf("%s:%s\n", internal.OpInstruction[op], line)
 				} else {
 					if o.ExpandSeq {
 						newItem := internal.ExpandShortcuts(item, seq.Shorts, seq.ShortsKeys)

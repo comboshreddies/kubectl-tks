@@ -205,7 +205,7 @@ In this case you could use {{_A}} as a short version of a {{OP_ATTACH}}.
 
 ## using sequence file for storing complex scripts
 
-If you are tired of creating One-Liners you have to remember, you could copy sequence.json to ~/tks directory (as mentioned in installation step 3 and 4 above)
+If you are tired of creating One-Liners you have to remember, you could copy sequence.json to ~/.tks directory (as mentioned in installation step 3 and 4 above)
 
 
 ## sequence.json contents

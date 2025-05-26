@@ -135,14 +135,14 @@ $ kubectl tks -n test-run start -l app=nginx  "_ exec -t {{k8s_pod}} -c nginx --
 ```
 
 
-## one-liner with more kubernetes related templated field
+## one-liner with more kubernetes related templated fields
 
 Now you can see we used k8s_pod as template field for each pod that was there in the test-run namespace.
 We can also use k8s_namespace template field to specify namespace (so you don't have to repeat test-run)
 There are also k8s_config and k8s_context template fields that would be filled if specified within tks command line parameters - if they are not specified they will be empty strings.
 
 ```console
-$ kubectl tks -n test-run start -l app=nginx  "_ exec -t {{k8s_pod}} -c nginx -- env" -T
+$ kubectl tks -n test-run start -l app=nginx  "kubectl -n {{k8s_namespace}} exec -t {{k8s_pod}} -c nginx -- env" -T
 # Unable to read conf file /Users/none/.tks/sequences.json, assuming oneLiner
 # unable to open sequence json file /Users/none/.tks/sequences.json
 # there is already session with this name (OneLiner--test-run), terminating old one
@@ -154,6 +154,15 @@ $ kubectl tks -n test-run start -l app=nginx  "_ exec -t {{k8s_pod}} -c nginx --
 #EXECUTE #0 nginx-sample1-6475dd48b7-bgtsx: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-bgtsx -c nginx -- env
 #EXECUTE #0 nginx-sample1-6475dd48b7-n6mtg: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
 #COMPLETED
+```
+It's simpler to use _ instead of kubectl --context {{k8s_context}} -n {{k8s_namespace}} exec -t {{k8s_pod}}
+but you always be more explicit. 
+
+You should be aware that there are shorcuts for kuberenetes related templated fields.
+Those are: cnf for kubeconfig, ctx for context , nsp for namespace, and pod for pods.
+so same command above could have shortened layout:
+```console
+$ kubectl tks -n test-run start -l app=nginx  "kubectl -n {{nsp}} exec -t {{pod}} -c nginx -- env" -T
 ```
 
 ## one-liner with dry run mode
@@ -255,7 +264,7 @@ In sequence.json scripts there is :
     ],
 ```
 If you run this one, OP_TERMINATE will instruct tks to terminate the tmux session, you will get only env files.
-
+Feel free to adjust and modify sripts section to fit your needs.
 
 ### sequence.json - list available scripts
 You can check a list of available scripts within sequence.json like this
@@ -265,11 +274,13 @@ kubectl tks list scripts
 ...
 
 ```
-you will get list of scripts with their info , scripts that are available in sequence.json file
+you will get list of scripts with their info, list will show scripts that are available in sequence.json file
 
-If you want to use some other sequence.json you can always use -f other_sequence_file.json do:
+If you want to use some other sequence.json config file you can always use -f other_sequence_file.json do:
 ```console
 kubectl tks list
+Usage:
+  kubect-tks list [scripts|shortcuts|podConverter|control|kctl] [flags]
 ```
 for more details on what can be listed.
 
@@ -291,7 +302,7 @@ If there are parts of scripts that you use that are frequently repeated instead 
 you can define shortcut
 ```console
 "XKNE" : "kubectl -n {{k8s_namespace}} exec "
-```consle
+```
 and use
 ```console
 "{{XKNE}} -c nginx -- env > {{k8s_pod}}}.env"
@@ -470,10 +481,10 @@ A: k8s_config, k8s_context, k8s_namespace, k8s_pod
 ```console
 $ kubectl tks list kctl
 Kubectl params:
- k8s_config
- k8s_context
- k8s_namespace
- k8s_pod
+ k8s_config or short cnf
+ k8s_context or short ctx
+ k8s_namespace or short nsp
+ k8s_pod or short pod
 ```
 
 ## Q: What other OP_ commands are available ?
@@ -481,16 +492,16 @@ A:
 ```console
 $ kubectl tks list control
 Controls:
- OP_TERMINATE - Terminate tmux, script end
- OP_ATTACH - Attach tmux, script end
- OP_DETACH - Detach tmux, script end, default behavior
- OP_FINALLY - Finally execute, script end
- OP_EXECUTE - Execute line
- OP_INFO - Print info
- OP_COMMENT - Print comment, render
- OP_NO_PROMPT_WAIT - Do not wait for prompt for last command
- OP_SLEEP - Sleep for n seconds
- OP_REFRESH_PROMPT - Load new prompt
+ OP_TERMINATE - _T - Terminate tmux, script end
+ OP_ATTACH - _A - Attach tmux, script end
+ OP_DETACH - _D - Detach tmux, script end, default behavior
+ OP_FINALLY - _F - Finally execute, script end
+ OP_EXECUTE - _E - Execute line, no need to specify, default behaviour
+ OP_INFO - _I - Print info
+ OP_COMMENT - _C - Print comment, render
+ OP_NO_PROMPT_WAIT - _N - Do not wait for prompt for last command
+ OP_SLEEP - _S - Sleep for n seconds
+ OP_REFRESH_PROMPT - _R - Load new prompt
 ```
 
 ## Q: How to use the same execution line for different pod container names, i.e. when -c container_name is not the same ?

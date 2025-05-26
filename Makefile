@@ -24,7 +24,7 @@ compile: clean generate fmt vet test build
 
 clean:
 	@echo "  >  Cleaning build cache"
-	@-rm -rf ${BIN_FOLDER}/amd64 ${BIN_FOLDER}/arm64 ${BIN_FOLDER}/${BIN_NAME} \
+	@-rm -rf ${BIN_FOLDER}/amd64 ${BIN_FOLDER}/arm64 ${BIN_FOLDER}/${BIN_NAME} ${RELEASE_DIR} \
 		&& go clean ./...
 
 build:

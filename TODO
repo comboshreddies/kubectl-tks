@@ -6,8 +6,9 @@ TODO:
 
 In k8s.go consider senting containers name list []string, currently not needed
 
-Add -C flag to run one liner without specifying script name
+# DONE - one-liners are supported now, no need for -C flag
+#Add -C flag to run one liner without specifying script name
 
-OP_RECORD (each pod capture in file per pod)
+OP_RECORD (each pod window capture in file per pod)
 
 Check timings check, make different ctrl+c or ctrl+\ (detach/terminate)

@@ -15,6 +15,6 @@ var versionCmd = &cobra.Command{
 	Short: "print version of kubectl-tks",
 	Long:  `print version of kubectl-tks`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("kubectl-tks v0.8.0")
+		fmt.Println("v0.8.0")
 	},
 }

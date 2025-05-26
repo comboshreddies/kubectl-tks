@@ -26,3 +26,5 @@ go.work.sum
 kubectl-tks
 
 bin/
+release/
+

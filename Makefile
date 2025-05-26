@@ -11,6 +11,8 @@ LINUX=linux
 BIN_FOLDER_AMD64=${BIN_FOLDER}/${AMD64}
 BIN_FOLDER_ARM64=${BIN_FOLDER}/${ARM64}
 BIN_NAME=${PROJECTNAME}
+RELEASE_DIR=release
+RELEASE_VERSION:=$$(${BIN_FOLDER}/${PROJECTNAME} version )
 
 MAKEFLAGS += --silent
 
@@ -29,8 +31,7 @@ build:
 	@echo "  >  Building binary"
 	@go build \
 		-ldflags="${LDFLAGS}" \
-		-o ${BIN_FOLDER}/${BIN_NAME} \
-		"${CLI_MAIN_FOLDER}"
+		-o ${BIN_FOLDER}/${BIN_NAME} 
 
 build-all: build-macos build-linux build-macos-arm build-linux-arm
 
@@ -39,33 +40,58 @@ build-macos:
 	@GOOS=darwin GOARCH=amd64 \
 		go build \
 		-ldflags="${LDFLAGS}" \
-		-o ${BIN_FOLDER_AMD64}/${BIN_NAME}_${AMD64}_${MAC} \
-		"${CLI_MAIN_FOLDER}"
+		-o ${BIN_FOLDER_AMD64}/${MAC}/${BIN_NAME}
 
 build-linux:
 	@echo "  >  Building binary for Linux"
 	@GOOS=linux GOARCH=amd64 \
 		go build \
 		-ldflags="${LDFLAGS}" \
-		-o ${BIN_FOLDER_AMD64}/${BIN_NAME}_${AMD64}_${LINUX} \
-		"${CLI_MAIN_FOLDER}"
+		-o ${BIN_FOLDER_AMD64}/${LINUX}/${BIN_NAME}
 
 build-macos-arm:
 	@echo "  >  Building binary for MacOS ARM"
 	@GOOS=darwin GOARCH=arm64 \
 		go build \
 		-ldflags="${LDFLAGS}" \
-		-o ${BIN_FOLDER_ARM64}/${BIN_NAME}_${ARM64}_${MAC} \
-		"${CLI_MAIN_FOLDER}"
+		-o ${BIN_FOLDER_ARM64}/${MAC}/${BIN_NAME}
 
 build-linux-arm:
 	@echo "  >  Building binary for Linux ARM"
 	@GOOS=linux GOARCH=arm64 \
 		go build \
 		-ldflags="${LDFLAGS}" \
-		-o ${BIN_FOLDER_ARM64}/${BIN_NAME}_${ARM64}_${LINUX} \
-		"${CLI_MAIN_FOLDER}"
+		-o ${BIN_FOLDER_ARM64}/${LINUX}/${BIN_NAME}
 
+pack-macos: build build-macos
+	@echo " > Packing release " ${RELEASE_VERSION} " " ${AMD64} " for MacOs" 
+	@mkdir -p ${RELEASE_DIR}/${RELEASE_VERSION}/${AMD64}/${MAC}/
+	@cp ${BIN_FOLDER_AMD64}/${MAC}/${BIN_NAME} ${RELEASE_DIR}/${RELEASE_VERSION}/${AMD64}/${MAC}/
+	@cp sequences.json ${RELEASE_DIR}/${RELEASE_VERSION}/${AMD64}/${MAC}/ 
+	@(cd ${RELEASE_DIR}/${RELEASE_VERSION}/${AMD64}/${MAC}/ ; tar czvf ../../${BIN_NAME}.${AMD64}_${MAC}.tgz ${BIN_NAME} sequences.json)
+
+pack-macos-arm: build build-macos-arm
+	@echo " > Packing release " ${RELEASE_VERSION} " " ${ARM64} " for MacOs" 
+	@mkdir -p ${RELEASE_DIR}/${RELEASE_VERSION}/${ARM64}/${MAC}/
+	@cp ${BIN_FOLDER_ARM64}/${MAC}/${BIN_NAME} ${RELEASE_DIR}/${RELEASE_VERSION}/${ARM64}/${MAC}/
+	@cp sequences.json ${RELEASE_DIR}/${RELEASE_VERSION}/${ARM64}/${MAC}/ 
+	@(cd ${RELEASE_DIR}/${RELEASE_VERSION}/${ARM64}/${MAC}/ ; tar czvf ../../${BIN_NAME}.${ARM64}_${MAC}.tgz ${BIN_NAME} sequences.json)
+
+pack-linux: build build-linux
+	@echo " > Packing release " ${RELEASE_VERSION} " " ${AMD64} " for Linux" 
+	@mkdir -p ${RELEASE_DIR}/${RELEASE_VERSION}/${AMD64}/${LINUX}/
+	@cp ${BIN_FOLDER_AMD64}/${LINUX}/${BIN_NAME} ${RELEASE_DIR}/${RELEASE_VERSION}/${AMD64}/${LINUX}/
+	@cp sequences.json ${RELEASE_DIR}/${RELEASE_VERSION}/${AMD64}/${LINUX}/ 
+	@(cd ${RELEASE_DIR}/${RELEASE_VERSION}/${AMD64}/${LINUX}/ ; tar czvf ../../${BIN_NAME}.${AMD64}_${LINUX}.tgz ${BIN_NAME} sequences.json)
+
+pack-linux-arm: build build-linux-arm
+	@echo " > Packing release " ${RELEASE_VERSION} " " ${ARM64} " for Linux" 
+	@mkdir -p ${RELEASE_DIR}/${RELEASE_VERSION}/${ARM64}/${LINUX}/
+	@cp ${BIN_FOLDER_ARM64}/${LINUX}/${BIN_NAME} ${RELEASE_DIR}/${RELEASE_VERSION}/${ARM64}/${LINUX}/
+	@cp sequences.json ${RELEASE_DIR}/${RELEASE_VERSION}/${ARM64}/${LINUX}/ 
+	@(cd ${RELEASE_DIR}/${RELEASE_VERSION}/${ARM64}/${LINUX}/ ; tar czvf ../../${BIN_NAME}.${ARM64}_${LINUX}.tgz ${BIN_NAME} sequences.json)
+
+pack-all: pack-macos pack-macos-arm pack-linux pack-linux-arm
 
 # Alpine & scratch base images use musl instead of gnu libc, thus we need to add additional parameters on the build
 build-alpine-scratch:

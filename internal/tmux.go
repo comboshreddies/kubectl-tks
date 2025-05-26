@@ -122,7 +122,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 		podIdx2WinIdx[i] = winName2Idx[ti.PodList[i].PodName]
 	}
 
-	fmt.Printf("#### Starting execution: sync : %t, dry %t\n", syncExec, dry)
+	fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
 	if syncExec == true {
 		line := ""
 		var operation OpDecoded

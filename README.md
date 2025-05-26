@@ -82,7 +82,7 @@ $ kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- en
 #### Creating new session OneLiner--test-run
 #### Creating windows per pod
 #### Collecting prompts for each window
-#### Starting execution: sync : false, dry false
+#### Starting execution: sync : false, dry : false
 #EXECUTE #0 nginx-sample1-6475dd48b7-br6jc: kubectl -n test-run exec nginx-sample1-6475dd48b7-br6jc -c nginx -- env
 #EXECUTE #0 nginx-sample1-6475dd48b7-n6mtg: kubectl -n test-run exec nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
 #EXECUTE #0 nginx-sample1-6475dd48b7-bgtsx: kubectl -n test-run exec nginx-sample1-6475dd48b7-bgtsx -c nginx -- env
@@ -127,7 +127,7 @@ $ kubectl tks -n test-run start -l app=nginx  "_ exec -t {{k8s_pod}} -c nginx --
 #### Creating new session OneLiner--test-run
 #### Creating windows per pod
 #### Collecting prompts for each window
-#### Starting execution: sync : false, dry false
+#### Starting execution: sync : false, dry : false
 #EXECUTE #0 nginx-sample1-6475dd48b7-n6mtg: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
 #EXECUTE #0 nginx-sample1-6475dd48b7-br6jc: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-br6jc -c nginx -- env
 #EXECUTE #0 nginx-sample1-6475dd48b7-bgtsx: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-bgtsx -c nginx -- env
@@ -149,7 +149,7 @@ $ kubectl tks -n test-run start -l app=nginx  "kubectl -n {{k8s_namespace}} exec
 #### Creating new session OneLiner--test-run
 #### Creating windows per pod
 #### Collecting prompts for each window
-#### Starting execution: sync : false, dry false
+#### Starting execution: sync : false, dry : false
 #EXECUTE #0 nginx-sample1-6475dd48b7-br6jc: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-br6jc -c nginx -- env
 #EXECUTE #0 nginx-sample1-6475dd48b7-bgtsx: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-bgtsx -c nginx -- env
 #EXECUTE #0 nginx-sample1-6475dd48b7-n6mtg: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
@@ -237,7 +237,7 @@ $ kubectl tks -n test-run start env-nginx-simple -l app=nginx -T
 #### Creating new session env-nginx-simple--test-run
 #### Creating windows per pod
 #### Collecting prompts for each window
-#### Starting execution: sync : false, dry false
+#### Starting execution: sync : false, dry : false
 #INFO #0, nginx-sample1-6475dd48b7-n6mtg:  execute env on each pod and put to pod.env file
 #INFO #0, nginx-sample1-6475dd48b7-bgtsx:  execute env on each pod and put to pod.env file
 #INFO #0, nginx-sample1-6475dd48b7-br6jc:  execute env on each pod and put to pod.env file

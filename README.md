@@ -573,4 +573,48 @@ nginx-sample2-5ffd775bc4-tcqn9 8 0 kubectl -n test-run exec nginx-sample2-5ffd77
 Above there are 3 deployments nginx-sample1, nginx-sample2 and busybox1, and -c (container) parameter is
 busybox for busybox pods and nginx for nginx pods.
 
+## Q: How to use same script for different types of pods with different shells or different package managers?
+A: Create podConverter section like:
+```console
+'p2inst': {
+   "apt install -y" : "debian-pod-name.*",
+   "apk add" : "alpine-pod-name.*",
+   "yum install -y" : "centos-pod-name.*"
+},
+"p2sh" : {
+   "/bin/sh" : "busybox.*",
+   "/bin/bash" : ".*"
+},
+"p2pack" : {
+   "libldap2-dev" : "debian.*",
+   "openldap-dev" : "alpine.*"
+},
+```
+then use in scripts or one-liners like
+```console
+"kubectl --context {{ctx}} -n {{nsp}} exec {{pod}} -c {{p2c}} -- {{p2sh}} -c '{{p2inst}} {{p2pack}}'"
+```
+or with shorcuts
+```console
+"{{EC}} {{p2sh}} -c '{{p2inst}} {{p2pack}}'"
+```
+or you can make whole line a signe shortcut if you want to extend it later.
+
+
+# Best practice:
+
+- do always run time limited (timeout) and execution limited commands (like -c in tcpdump or ping), otherwise
+your execution might be left running on a pod for a very long time, and affect normal pod state
+
+- if you are running something without limitations, create sequence that could terminate such executions
+for example if you are running tcpdump, do create sequence to kill any tcpdump that might be left running
+
+- if you need longer set of sequences, then frequent kubectl exec sequence is not optimal. You have two
+options. One is to create local script, then on each tmux-windows/pod customize script
+copy script to pod/container, run script, copy back results. Second is to interactivelly exec to kube pod
+(kubect exec -it ) and then request {{OP_NO_PROMPT_WAIT}} and then {{OP_REFRESH_PROMPT}}. Those commands
+will instruct tks not to wait for prompt, and to load new prompt line in tks state.
+
+
+
 

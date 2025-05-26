@@ -8,6 +8,11 @@
     "p2cLogs": {
       "busybox": "logs",
       "main": ".*"
+    },
+    "p2sh": {
+      "/bin/sh": "logs",
+      "/bin/bash" : "nginx",
+      "/bin/sh": ".*"
     }
   },
   "shortcuts": {
@@ -15,6 +20,8 @@
     "K" : "_",
     "EC" : "_ exec {{pod}} -c {{p2c}} --",
     "EIC" : "_ exec -it {{pod}} -c {{p2c}} --",
+    "ECB" : "_ exec {{pod}} -c {{p2c}} -- /bin/bash -c ",
+    "ECBS" : "_ exec -it -c {{p2c}} -- {{p2sh}} -c ",
     "LC" : "_ logs -f {{LOGS_SWITCHES}} {{pod}} -c {{p2cLog}}",
     "ECV": "{{EC}} /bin/bash -c "
   },
@@ -207,6 +214,7 @@
       "{{OP_FINALLY}} echo done > /tmp/x"
     ],
     "remote-exec": [
+      "{{_I}} example of attaching to remote host with different prompt",
       "{{ECB}}",
       "{{OP_NO_PROMPT_WAIT}}",
       "{{OP_REFRESH_PROMPT}}",

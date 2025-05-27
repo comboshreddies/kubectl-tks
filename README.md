@@ -6,10 +6,14 @@ Tks plugin runs multiple execution scripts (sequences) in multiple tmux windows.
 Each window runs a script on one pod. You can decide if you want to attach and inspect
 executions per each pod, or you want to just execute and exit tmux.
 
+As a good practice you should not run things on pods/containers, but if you do,
+and if you frequently and on many different pods namespaces, cluster, then
+this tool might be helpful.
+
 With this tool you can:
 1) run any command for specific pod selections, like: 
 ```console
-"exec {{k8s_pod}} -c {{p2c}}  -- /bin/sh `env > {{k8s_pod}}.env`"
+"exec {{pod}} -c {{p2c}}  -- /bin/sh `env > {{k8s_pod}}.env`"
 ```
 tks will automatically change pod name namespace and for each execution step
 
@@ -602,6 +606,7 @@ or you can make whole line a signe shortcut if you want to extend it later.
 
 
 # Best practice:
+- use OP_INFO as a first line of a script as it will be used as a help line for script
 
 - do always run time limited (timeout) and execution limited commands (like -c in tcpdump or ping), otherwise
 your execution might be left running on a pod for a very long time, and affect normal pod state

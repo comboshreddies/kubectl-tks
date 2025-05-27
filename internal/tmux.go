@@ -37,6 +37,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 	//	fmt.Println("------====----")
 
 	if dry == true {
+	        fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
 		dryRunPrintOut(ti, syncExec)
 		return
 	}
@@ -402,7 +403,7 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
 	podName := ti.PodList[podListIndex].PodName
 	original := ti.ScriptLines[scriptLineIndex]
 	var line string
-	var op OpDecoded
+	op := OpExecute
 	if len(original) > 5 && original[:2] == "{{" {
 		op, line = OpLineTagToString(original)
 		original = line

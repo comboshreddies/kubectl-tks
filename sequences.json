@@ -18,12 +18,13 @@
   "shortcuts": {
     "LOGS_SWITCHES": " --prefix --timestamps --max-log-requests 100 ",
     "K" : "_",
+    "EP" : "exec {{pod}}",
     "EC" : "_ exec {{pod}} -c {{p2c}} --",
     "EIC" : "_ exec -it {{pod}} -c {{p2c}} --",
     "ECB" : "_ exec {{pod}} -c {{p2c}} -- /bin/bash -c ",
     "ECBS" : "_ exec -it -c {{p2c}} -- {{p2sh}} -c ",
     "LC" : "_ logs -f {{LOGS_SWITCHES}} {{pod}} -c {{p2cLog}}",
-    "ECV": "{{EC}} /bin/bash -c "
+    "ECB": "{{EC}} /bin/bash -c "
   },
   "scripts": {
     "custom": [
@@ -65,32 +66,8 @@
     "tcpdump-all": [
       "{{OP_INFO}} tcpdump on any interface all traffic for 300 seconds or 100k packets",
       "{{ECB}} \"apt -y update && apt -y install tcpdump\"",
-      "{{ECB}} \"timeout 300 tcpdump -i any -w /tmp/{{k8s_pod}}.pcap -s65535 -c 100000\"",
+      "{{ECB}} \"timeout 10 tcpdump -i any -w /tmp/{{k8s_pod}}.pcap -s65535 -c 1000\"",
       "{{ECB}} \"rm -f /tmp/{{k8s_pod}.pcap.gz && cd /tmp && gzip {{k8s_pod}}.pcap\"",
-      "{{K}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.pcap.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.pcap.gz",
-      "{{OP_TERMINATE}}"
-    ],
-    "tcpdump-http-80": [
-      "{{OP_INFO}} install tcpdump and start tcpdump on all interfaces on port 80",
-      "{{ECB}} \"apt -y update && apt -y install tcpdump\"",
-      "{{ECB}} \"timeout 300 tcpdump -i any -w /tmp/{{k8s_pod}}.pcap -s65535 -c 100000 port 80\"",
-      "{{ECB}} \"rm -f /tmp/{{pod}}.pcap.gz && cd /tmp && gzip {{k8s_pod}}.pcap\"",
-      "{{K}} + 'cp {{k8s_pod}}:/tmp/{{k8s_pod}}.pcap.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.pcap.gz",
-      "{{OP_TERMINATE}}"
-    ],
-    "tcpdump-redis-6379": [
-      "{{OP_INFO}} install tcpdump and start tcpdump on all interfaces on port 6379",
-      "{{ECB}} \"apt -y update && apt -y install tcpdump\"",
-      "{{ECB}} \"timeout 300 tcpdump -i any -w /tmp/{pod}.pcap -s65535 -c 100000 port 6379\"",
-      "{{ECB}} \"rm -f /tmp/{{k8s_pod}}.pcap.gz && cd /tmp && gzip {{k8s_pod}}.pcap\"",
-      "{{K}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.pcap.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.pcap.gz",
-      "{{OP_TERMINATE}}"
-    ],
-    "tcpdump-memcache-11211": [
-      "{{OP_INFO}} install tcpdump and start tcpdump on all interfaces on port 11211",
-      "{{EC}} \"apt -y update && apt -y install tcpdump\"",
-      "{{EC}} \"timeout 300 tcpdump -i any -w /tmp/{pod}.pcap -s65535 -c 100000 port 11211\"",
-      "{{EC}} \"rm -f /tmp/{{k8s_pod}}.pcap.gz && cd /tmp && gzip {{k8s_pod}}.pcap\"",
       "{{K}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.pcap.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.pcap.gz",
       "{{OP_TERMINATE}}"
     ],
@@ -98,14 +75,6 @@
       "{{OP_INFO}} install strace and start strace on all php processes",
       "{{ECB}} \"apt -y update && apt -y install strace psmisc procps\"",
       "{{ECB}} \"timeout 300 strace -o /tmp/{{k8s_pod}}.strace -s999999 -yy -tt -T $(pgrep php | awk '{ print \" -p \" $1}') \"",
-      "{{ECB}} \"rm -f /tmp/{{k8s_pod}}.strace.gz && cd /tmp && gzip {{k8s_pod}}.strace\"",
-      "{{K}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.strace.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.strace.gz",
-      "{{OP_TERMINATE}}"
-    ],
-    "strace-net-php": [
-      "{{OP_INFO}} install strace and start strace on all php processes record net system calls",
-      "{{ECB}} \"apt -y update && apt -y install strace psmisc procps\"",
-      "{{ECB}} \"timeout 300 strace -o /tmp/{{k8s_pod}}.strace -s999999 -yy -tt -T $(pgrep php | xargs -Ix echo -p x ) \"",
       "{{ECB}} \"rm -f /tmp/{{k8s_pod}}.strace.gz && cd /tmp && gzip {{k8s_pod}}.strace\"",
       "{{K}} cp {{k8s_pod}}:/tmp/{{k8s_pod}}.strace.gz -c {{p2c}} --retries=4 ./{{k8s_pod}}.strace.gz",
       "{{OP_TERMINATE}}"
@@ -145,26 +114,6 @@
       "{{OP_INFO}} execute bash on each pod in interactive mode and attach to tmux",
       "{{EIC}} /bin/bash",
       "{{OP_NO_PROMPT_WAIT}}",
-      "{{DO_ATTACH}}"
-    ],
-    "kctl-exec-sh": [
-      "{{OP_INFO}} execute sh on each pod in interactive mode and attach to tmux",
-      "{{EIC}} /bin/sh",
-      "{{OP_NO_PROMPT_WAIT}}",
-      "{{OP_COMMENT}} no return after a command instructs not to wait for locally fetched prompt",
-      "{{OP_COMMENT}} so next line is executed/sent to kubectl shell",
-      "env",
-      "{{OP_NO_PROMPT_WAIT}}",
-      "date",
-      "{{OP_NO_PROMPT_WAIT}}",
-      "{{OP_SLEEP}} 4",
-      "date",
-      "{{OP_COMMENT}} in kubectl exec we have new prompt different than one on local machine",
-      "{{OP_COMMENT}} instruct this tool to load new prompt",
-      "{{OP_REFRESH_PROMPT}}",
-      "date",
-      "date",
-      "date",
       "{{DO_ATTACH}}"
     ],
     "exec-it-sh": [

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"k8s.io/client-go/util/homedir"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -45,6 +46,8 @@ func processList(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	seq := internal.SequenceConfig{}
+
 	if o.ScriptFile == "" {
 		if home := homedir.HomeDir(); home != "" {
 			o.ScriptFile = filepath.Join(home, ".tks/sequences.json")
@@ -53,20 +56,38 @@ func processList(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	seq, err := internal.OpenAndReadSequencefile(o.ScriptFile)
-	if err != nil {
-		fmt.Printf("Can't read conf file\n")
-		fmt.Println(err)
+	_, err := os.Stat(o.ScriptFile)
+	if err != nil { // check for krew store path
+		if home := homedir.HomeDir(); home != "" {
+			o.ScriptFile = filepath.Join(home, ".krew/store/tks", internal.TksVersion, "sequences.json")
+		} else { // windows part, not sure at the moment
+			o.ScriptFile = "sequences.json"
+		}
+	}
+	_, err = os.Stat(o.ScriptFile)
+	if err != nil { // check for krew store path
+		fmt.Printf("# No script file %s found, try using -f <path_to_sequence.file>\n", "sequences.json")
 		return
+	} else {
+		seq, err = internal.OpenAndReadSequencefile(o.ScriptFile)
+		if err != nil {
+			fmt.Printf("Can't read conf file\n")
+			fmt.Println(err)
+			return
+		}
 	}
 
 	var keys []string
 	if args[0] == "scripts" {
 		for i := 0; i < len(seq.Scripts); i++ {
-			var help string
+			help := ""
 			if len(seq.Scripts[i].Items) > 1 && strings.HasPrefix(seq.Scripts[i].Items[0], "{{OP_INFO}}") {
-				help = fmt.Sprintf("  %s  : %s", seq.Scripts[i].Name, seq.Scripts[i].Items[0][len("{{PO_INFO}}"):])
-			} else {
+				help = fmt.Sprintf("  %s  : %s", seq.Scripts[i].Name, seq.Scripts[i].Items[0][len("{{OP_INFO}}"):])
+			}
+			if len(seq.Scripts[i].Items) > 1 && strings.HasPrefix(seq.Scripts[i].Items[0], "{{_I}}") {
+				help = fmt.Sprintf("  %s  : %s", seq.Scripts[i].Name, seq.Scripts[i].Items[0][len("{{_I}}"):])
+			}
+			if help == "" {
 				help = fmt.Sprintf("  %s  : ", seq.Scripts[i].Name)
 			}
 			keys = append(keys, help)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-        "kubectl-tks/internal"
+	"kubectl-tks/internal"
 )
 
 func init() {
@@ -16,6 +16,6 @@ var versionCmd = &cobra.Command{
 	Short: "print version of kubectl-tks",
 	Long:  `print version of kubectl-tks`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(tksVersion)
+		fmt.Println(internal.TksVersion)
 	},
 }

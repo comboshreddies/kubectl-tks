@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -39,6 +40,9 @@ func processStart(cmd *cobra.Command, args []string) {
 	//	fmt.Println(args)
 	//        fmt.Printf("dry %t sync %t\n",o.KTxDryRun, o.KTxSync)
 
+	noConfFile := false
+	seq := internal.SequenceConfig{}
+
 	if o.ScriptFile == "" {
 		if home := homedir.HomeDir(); home != "" {
 			o.ScriptFile = filepath.Join(home, ".tks/sequences.json")
@@ -47,14 +51,28 @@ func processStart(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	noConfFile := false
-	seq, err := internal.OpenAndReadSequencefile(o.ScriptFile)
-	if err != nil {
-		fmt.Printf("# Unable to read conf file %s, assuming oneLiner\n", o.ScriptFile)
-		fmt.Println(err)
+	_, err := os.Stat(o.ScriptFile)
+	if err != nil { // check for krew store path
+		if home := homedir.HomeDir(); home != "" {
+			o.ScriptFile = filepath.Join(home, ".krew/store/tks", internal.TksVersion, "sequences.json")
+		} else { // windows part, not sure at the moment
+			o.ScriptFile = "sequences.json"
+		}
+	}
+	_, err = os.Stat(o.ScriptFile)
+	if err != nil { // check for krew store path
+		fmt.Printf("# No script file %s found, try using -f <path_to_sequence.file>\n", "sequences.json")
 		noConfFile = true
-		seq = internal.SequenceConfig{}
 		seq.Shorts = nil
+	} else {
+		seq, err := internal.OpenAndReadSequencefile(o.ScriptFile)
+		if err != nil {
+			fmt.Println(err)
+			fmt.Printf("# Unable to read conf file %s, assuming oneLiner\n", o.ScriptFile)
+			noConfFile = true
+			seq = internal.SequenceConfig{}
+			seq.Shorts = nil
+		}
 	}
 
 	noScript := false

@@ -1,18 +1,19 @@
-
 TODO:
 
-In k8s.go consider senting containers name list []string, currently not needed
+* change list.go to use opDecode - do not implement parsing more than once
+* implement error wrapping, unwrapping
 
-OP_CAPTURE (each pod window capture in file per pod with argument for filename)
+* OP_CAPTURE (each pod window capture in file per pod with argument for filename)
+  what will be the shortcut as there is already _C ?, maybe PRINT_SCREEN
 
-Check timings check, make different ctrl+c or ctrl+\ (detach/terminate)
+* Check timings check, make different ctrl+c or ctrl+\ (detach/terminate)
 
-expand shortcuts in info
-
-switch to managing windows by pod-name not by index (as index can change)
--R as alternative to -T to reuse not to terminate, should wait for managing windows by pod-name
-
-add session-name to set of rendered/template variables available items so script can be
+* switch to managing windows by pod-name not by index (as index can change)
+  -R as alternative to -T to reuse not to terminate, should wait for managing windows by pod-name
+ 
+* add session-name to set of rendered/template variables available items so script can be
 aware of session it runs to
 
-support for krew store .krew/store/tks/v0.8.0/~/.tks/sequences.json
+* In k8s.go consider recording containers name list []string, currently not needed, maybe for
+some additional functionality
+

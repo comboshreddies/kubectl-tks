@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/util/homedir"
@@ -24,7 +25,6 @@ func init() {
 }
 
 func processInfo(cmd *cobra.Command, args []string) {
-
 	if o.ScriptFile == "" {
 		if home := homedir.HomeDir(); home != "" {
 			o.ScriptFile = filepath.Join(home, ".tks/sequences.json")
@@ -33,9 +33,27 @@ func processInfo(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	seq, err := internal.OpenAndReadSequencefile(o.ScriptFile)
-	if err != nil {
-		fmt.Println(err)
+	seq := internal.SequenceConfig{}
+
+	_, err := os.Stat(o.ScriptFile)
+	if err != nil { // check for krew store path
+		if home := homedir.HomeDir(); home != "" {
+			o.ScriptFile = filepath.Join(home, ".krew/store/tks", internal.TksVersion, "sequences.json")
+		} else { // windows part, not sure at the moment
+			o.ScriptFile = "sequences.json"
+		}
+	}
+	_, err = os.Stat(o.ScriptFile)
+	if err != nil { // check for krew store path
+		fmt.Printf("# No script file %s found, try using -f <path_to_sequence.file>\n", "sequences.json")
+		return
+	} else {
+
+		seq, err = internal.OpenAndReadSequencefile(o.ScriptFile)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
 	var match bool = false
 
@@ -44,9 +62,9 @@ func processInfo(cmd *cobra.Command, args []string) {
 			match = true
 			fmt.Println("--------")
 			for j := 0; j < len(seq.Scripts[i].Items); j++ {
-				fmt.Printf("%d: \n", j)
 				item := seq.Scripts[i].Items[j]
-				if len(item) > 2 && item[:2] == "{{" {
+				fmt.Printf("Script line %d :\n", j)
+				if (len(item) > 3 && item[:3] == "{{_") || (len(item) > 5 && item[:4] == "{{OP_") {
 					op, line := internal.OpLineTagToString(item)
 					fmt.Printf("%s:%s\n", internal.OpInstruction[op], line)
 				} else {

@@ -37,7 +37,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 	//	fmt.Println("------====----")
 
 	if dry == true {
-	        fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
+		fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
 		dryRunPrintOut(ti, syncExec)
 		return
 	}

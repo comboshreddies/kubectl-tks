@@ -14,3 +14,5 @@ switch to managing windows by pod-name not by index (as index can change)
 
 add session-name to set of rendered/template variables available items so script can be
 aware of session it runs to
+
+support for krew store .krew/store/tks/v0.8.0/~/.tks/sequences.json

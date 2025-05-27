@@ -65,7 +65,7 @@ func processStart(cmd *cobra.Command, args []string) {
 		noConfFile = true
 		seq.Shorts = nil
 	} else {
-		seq, err := internal.OpenAndReadSequencefile(o.ScriptFile)
+		seq, err = internal.OpenAndReadSequencefile(o.ScriptFile)
 		if err != nil {
 			fmt.Println(err)
 			fmt.Printf("# Unable to read conf file %s, assuming oneLiner\n", o.ScriptFile)

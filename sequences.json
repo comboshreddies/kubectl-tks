@@ -1,5 +1,5 @@
 {
-  "podConverter": {
+  "podMap": {
     "p2c": {
       "busybox": "busybox.*",
       "nginx": "nginx.*",

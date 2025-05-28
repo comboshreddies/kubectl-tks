@@ -16,14 +16,14 @@ type scriptItem struct {
 	Items []string
 }
 
-type podConverter struct {
+type podMap struct {
 	Name  string
 	Keys  []string
 	Rules map[string]string
 }
 
 type SequenceConfig struct {
-	PodCs      []podConverter
+	PodCs      []podMap
 	Shorts     map[string]string
 	ShortsKeys []string
 	Scripts    []scriptItem
@@ -48,9 +48,9 @@ func OpenAndReadSequencefile(fileName string, quiet bool) (conf SequenceConfig, 
 	}
 
 	for key, val := range result {
-		if key == "podConverter" {
+		if key == "podMap" {
 			for key1, val1 := range val.(map[string]interface{}) {
-				var x podConverter
+				var x podMap
 				x.Name = key1
 				x.Rules = make(map[string]string)
 				for key2, val2 := range val1.(map[string]interface{}) {
@@ -60,7 +60,7 @@ func OpenAndReadSequencefile(fileName string, quiet bool) (conf SequenceConfig, 
 				seq.PodCs = append(seq.PodCs, x)
 			}
 			if !quiet {
-				fmt.Printf("#PodConverter loaded from %s\n", fileName)
+				fmt.Printf("#PodMap loaded from %s\n", fileName)
 			}
 		}
 		if key == "shortcuts" {
@@ -220,7 +220,7 @@ func ExpandP2cRule(rules map[string]string, keys []string, pod string) string {
 	return "default"
 }
 
-func ExpandPodConverter(line, K8s_pod string, p2c []podConverter) string {
+func ExpandPodMapper(line, K8s_pod string, p2c []podMap) string {
 	newLine := line
 	for l := 0; l < 100; l++ {
 		changes := false

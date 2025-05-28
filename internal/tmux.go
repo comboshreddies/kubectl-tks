@@ -19,7 +19,7 @@ type TmuxInData struct {
 	PodList      []PodsInfo
 	Shorts       map[string]string
 	ShortsKeys   []string
-	PodCs        []podConverter
+	PodCs        []podMap
 	Prompt       string
 	PromptSleep  int
 	SessionName  string
@@ -425,7 +425,7 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
 	line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
 	line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)
 	line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
-	line = ExpandPodConverter(line, podName, ti.PodCs)
+	line = ExpandPodMapper(line, podName, ti.PodCs)
 
 	fmt.Printf("%s %d %d (%s) %s\n", podName, podListIndex, scriptLineIndex, OpInstruction[op], line)
 }
@@ -443,7 +443,7 @@ func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string 
 	line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
 	line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)
 	line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
-	line = ExpandPodConverter(line, podName, ti.PodCs)
+	line = ExpandPodMapper(line, podName, ti.PodCs)
 	return line
 }
 

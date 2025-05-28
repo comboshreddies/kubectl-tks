@@ -1,21 +1,20 @@
 TODO:
 
+code quality:
 * change list.go to use opDecode - do not implement parsing more than once
 * implement error wrapping, unwrapping
 
+feature:
 * OP_CAPTURE (each pod window capture in file per pod with argument for filename)
   what will be the shortcut as there is already _C ?, maybe PRINT_SCREEN
-
 * Check timings check, make different ctrl+c or ctrl+\ (detach/terminate)
-
-* switch to managing windows by pod-name not by index (as index can change)
-  -R as alternative to -T to reuse not to terminate, should wait for managing windows by pod-name
- 
 * add session-name to set of rendered/template variables available items so script can be
-aware of session it runs to
-
+  aware of session it runs to
 * In k8s.go consider recording containers name list []string, currently not needed, maybe for
 some additional functionality
 
-* podConverter -> podNameMapper
+architecture:
+* switch to managing windows by pod-name not by index (as index can change)
+  -R as alternative to -T to reuse not to terminate, should wait for managing windows by pod-name
+
 

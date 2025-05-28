@@ -13,8 +13,8 @@ import (
 )
 
 var cmdList = &cobra.Command{
-	Use:   "list [scripts|shortcuts|podConverter|control|kctl]",
-	Short: "list objects: scripts, shortcuts, podConverter, control, kctl",
+	Use:   "list [scripts|shortcuts|podMap|control|kctl]",
+	Short: "list objects: scripts, shortcuts, podMap, control, kctl",
 	Long:  "list available objects from a sequence file.",
 	Args:  cobra.MinimumNArgs(1),
 	Run:   processList,
@@ -27,7 +27,7 @@ func init() {
 
 func processList(cmd *cobra.Command, args []string) {
 	if len(args) != 1 {
-		fmt.Println("list needs argument: scripts, shortcuts, podConverter, control")
+		fmt.Println("list needs argument: scripts, shortcuts, podMap, control")
 	}
 
 	if args[0] == "kctl" {
@@ -114,7 +114,7 @@ func processList(cmd *cobra.Command, args []string) {
 			fmt.Printf("%s : %s\n", key, value)
 		}
 	}
-	if args[0] == "podConverter" {
+	if args[0] == "podMap" {
 		for i := 0; i < len(seq.PodCs); i++ {
 			fmt.Printf("%s :\n", seq.PodCs[i].Name)
 			for j := 0; j < len(seq.PodCs[i].Keys); j++ {

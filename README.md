@@ -237,7 +237,7 @@ If you are tired of creating One-Liners you have to remember, you could copy seq
 sequence.json file contains 3 sections:
 - scripts
 - shortcuts
-- podConverter
+- podMap
 
 
 ### sequence.json - scripts section 
@@ -299,7 +299,7 @@ You can check a list of available scripts within sequence.json like this
 kubectl tks list scripts
 ```
 ```
-#PodConverter loaded from sequence.file
+#PodMap loaded from sequence.file
 #Shortcuts loaded from sequence.file
 #Sripts loaded from sequence.file
   custom  :  custom shell script, just passing variables
@@ -320,7 +320,7 @@ kubectl tks list
 ```
 ```
 Usage:
-  kubect-tks list [scripts|shortcuts|podConverter|control|kctl] [flags]
+  kubect-tks list [scripts|shortcuts|podMap|control|kctl] [flags]
 ```
 
 
@@ -357,7 +357,7 @@ Before executing of each line:
     * first shortcuts template fields are being resolved, 
     * then strating _ is resolved
     * then k8s_ template fields are being replaced
-    * then podConverter mappings
+    * then podMap mappings
 
 
 ### sequence.json - shortcuts - available shortcuts
@@ -374,16 +374,16 @@ LC : _ logs -f {{KCTL_LOGS_SWITCHES}} {{pod}} -c {{p2cLog}}
 ```
 
 
-## sequence.json - podConverter intro
+## sequence.json - podMap intro
 
-While running tks in some cases you might have to run the same script (list of commands) on various pods.
+While running tks in some cases you might have to run the same script (sequence of commands) on various pods.
 Some pods might have different pod name (pod that you are interested to jump and execute something in),
 some might have different container name, or it might have different shell, for example not /bin/sh but /bin/bash.
 
-To make script reusable on various kinds pods there is podConverter section of sequence.json
+To make script reusable on various kinds pods there is podMap section of sequence.json
 Below is a section that describe rules that would be used for mapping pod name to container name
 ```jsonl
-"podConverter" : {
+"podMap" : {
     "p2c" : {
         "busybox" : "busybox.*",
         "nginx" : "nginx.*",
@@ -417,9 +417,9 @@ ie
 ```
 
 
-### sequence.json - podConverter - adding second rule
+### sequence.json - podMap - adding second rule
 
-In some cases containers that do print logs are not the same container so you can specify new podConverter section
+In some cases containers that do print logs are not the same container so you can specify new podMap section
 ```jsonl
    "p2cLogs" : {
        "busybox" : "logs",
@@ -429,9 +429,10 @@ In some cases containers that do print logs are not the same container so you ca
 and you can use {{p2cLogs}} field template in your scripts.
 
 
-### sequence.json - podConverters in oneLiners
+### sequence.json - podMaps in oneLiners
 
-Now that you have sequences.json you can use podConverters in your OneLiners
+You can't manage podMaps from cli, you have to rely on sequences.json
+Once you have sequences.json you can use podMaps in your OneLiners
 
 ```console
 kubectl tks -n test-run start -l app=nginx  "_ exec -t {{k8s_pod}} -c {{p2c}} -- env" -d
@@ -539,10 +540,10 @@ Controls:
 ```
 
 ## Q: How to use the same execution line for different pod container names, i.e. when -c container_name is not the same ?
-A: use podConverter section of sequences.json file (~/.tks/sequences.json)
+A: use podMap section of sequences.json file (~/.tks/sequences.json)
 
 ```jsonl
-"podConverter" : {
+"podMap" : {
     "p2c" : {
         "busybox" : "busybox.*",
         "nginx" : "nginx.*",
@@ -560,7 +561,7 @@ kubectl tks -n test-run start "_ exec {{pod}} -c {{p2c}} -- env" -d
 
 ```
 #Sripts loaded from sequence.file
-#PodConverter loaded from sequence.file
+#PodMap loaded from sequence.file
 #Shortcuts loaded from sequence.file
 # No matching script _ exec {{pod}} -c {{p2c}} -- env in conf file
 # assuming oneLiner
@@ -578,7 +579,7 @@ Above there are 3 deployments nginx-sample1, nginx-sample2 and busybox1, and -c 
 busybox for busybox pods and nginx for nginx pods.
 
 ## Q: How to use same script for different types of pods with different shells or different package managers?
-A: Create podConverter section like:
+A: Create podMap section like:
 ```console
 'p2inst': {
    "apt install -y" : "debian-pod-name.*",

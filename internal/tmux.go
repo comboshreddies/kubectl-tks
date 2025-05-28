@@ -153,9 +153,9 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 			case OpFinally:
 				break
 			case OpExecute:
-				fmt.Printf("#EXECUTE: %s\n", line)
 				for podIdx := 0; podIdx < len(ti.PodList); podIdx++ {
 					execLine := RenderLineForExec(ti, podIdx, scrIdx)
+					fmt.Printf("#EXECUTE: #%d %s: %s\n", scrIdx, ti.PodList[podIdx].PodName, line)
 					err := windowsSendKeys(windows[podIdx2WinIdx[podIdx]], execLine+"\n")
 					if err != nil {
 						fmt.Println(err)
@@ -163,7 +163,6 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 					}
 				}
 				doPromptCheck := true
-				fmt.Printf("X- %d %d\n", len(ti.ScriptLines), scrIdx)
 				if len(ti.ScriptLines) > scrIdx+1 {
 					nextOperation, _ := opDecode(ti.ScriptLines[scrIdx+1])
 					if nextOperation == OpNoPrompt || nextOperation == OpRefreshPrompt {
@@ -186,6 +185,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 						}
 					}
 				}
+				fmt.Printf("#STEP %d complete on all pods\n", scrIdx)
 			case OpInfo:
 				fmt.Printf("#INFO: %s\n", line)
 			case OpComment:
@@ -413,7 +413,7 @@ func tmux_get_pane_prompt(window *gotmux.Window) (prompt string, err error) {
 	return prevprompt, nil
 }
 
-func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
+func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int, syncExec bool) {
 	podName := ti.PodList[podListIndex].PodName
 	original := ti.ScriptLines[scriptLineIndex]
 	var line string
@@ -428,7 +428,24 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
 	line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
 	line = ExpandPodMapper(line, podName, ti.PodCs)
 
-	fmt.Printf("%s %d %d (%s) %s\n", podName, podListIndex, scriptLineIndex, OpInstruction[op], line)
+	div := "| "
+	if syncExec == true {
+		if podListIndex == 0 {
+			div = "/-"
+		}
+		if podListIndex == len(ti.PodList)-1 {
+			div = "\\-"
+		}
+	} else {
+		if scriptLineIndex == 0 {
+			div = "/-"
+		}
+		if scriptLineIndex == len(ti.ScriptLines)-1 {
+			div = "\\-"
+		}
+	}
+
+	fmt.Printf("%s %s %d %d (%s) %s\n", div, podName, podListIndex, scriptLineIndex, OpInstruction[op], line)
 }
 
 func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string {
@@ -455,13 +472,13 @@ func dryRunPrintOut(ti TmuxInData, syncExec bool) {
 	if syncExec == true {
 		for i := 0; i < len(ti.ScriptLines); i++ {
 			for j := 0; j < len(ti.PodList); j++ {
-				dryRenderLine(ti, j, i)
+				dryRenderLine(ti, j, i, syncExec)
 			}
 		}
 	} else {
 		for i := 0; i < len(ti.PodList); i++ {
 			for j := 0; j < len(ti.ScriptLines); j++ {
-				dryRenderLine(ti, i, j)
+				dryRenderLine(ti, i, j, syncExec)
 			}
 		}
 	}

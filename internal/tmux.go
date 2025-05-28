@@ -428,24 +428,31 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int, syncExec bo
 	line = ExpandK8s(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace, podName)
 	line = ExpandPodMapper(line, podName, ti.PodCs)
 
-	div := "| "
+	div := "|"
 	if syncExec == true {
 		if podListIndex == 0 {
-			div = "/-"
+			div = "/"
 		}
 		if podListIndex == len(ti.PodList)-1 {
-			div = "\\-"
+			div = "\\"
+		}
+		if 1 == len(ti.PodList) {
+			div = "*"
 		}
 	} else {
 		if scriptLineIndex == 0 {
-			div = "/-"
+			div = "/"
 		}
 		if scriptLineIndex == len(ti.ScriptLines)-1 {
-			div = "\\-"
+			div = "\\"
+		}
+		if 1 == len(ti.ScriptLines) {
+			div = "*"
 		}
 	}
 
-	fmt.Printf("%s %s %d %d (%s) %s\n", div, podName, podListIndex, scriptLineIndex, OpInstruction[op], line)
+	fmt.Printf("%s %s%d %s: %s\n", OpPrint[op], div, scriptLineIndex, podName, line)
+
 }
 
 func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string {

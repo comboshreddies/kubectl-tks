@@ -1,0 +1,25 @@
+reset
+termtosvg ../02_tks.svg
+reset
+banner " " " " "tks :" "tmux left" "running" | lolcat
+
+# next run of one-liner will try to open same session name and will fail with error,
+# as one-liners might have overlapping session-names and will fail
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env" 
+# ^^ last line shows error   
+# let us check tmux session, you can easily do tmux kill-session -t <session name>
+tmux ls
+# session is composed of a context,namespace, and script name, and for one-liners
+# script name is "OneLiner" and always the same for one-liners
+#
+# if you want to use different tmux session name, use start command
+# with -S <your session name>
+#
+# by adding -T option will instruct tks to kill previous session before starting new one
+kubectl tks -n test-run start -l app=nginx  "_ exec -t {{pod}} -c nginx -- env" -T 
+#
+# later you will see how to terminate session within script/one-liner
+# you might have something valuable within tmux and we do not want to
+# delete previous session as default behaviour
+#    
+exit

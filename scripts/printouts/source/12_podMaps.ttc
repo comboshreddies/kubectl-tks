@@ -1,0 +1,4 @@
+termtosvg ../s_12_tks.svg
+tks -n test-run start -l app=nginx tcpdump-all -d 
+ 
+exit

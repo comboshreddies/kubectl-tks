@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="terminal" baseProfile="full" viewBox="0 0 976 512" width="976" version="1.1">
+    <defs>
+        <termtosvg:template_settings xmlns:termtosvg="https://github.com/nbedos/termtosvg">
+            <termtosvg:screen_geometry columns="122" rows="30"/>
+            <termtosvg:animation type="css"/>
+        </termtosvg:template_settings>
+        <style type="text/css" id="generated-style"><![CDATA[#screen {
+                font-family: 'DejaVu Sans Mono', monospace;
+                font-style: normal;
+                font-size: 14px;
+            }
+
+        text {
+            dominant-baseline: text-before-edge;
+            white-space: pre;
+        }
+    
+            :root {
+                --animation-duration: 10121ms;
+            }
+
+            @keyframes roll {
+                0.000%{transform:translateY(0px)}
+19.415%{transform:translateY(-544px)}
+20.008%{transform:translateY(-1088px)}
+20.709%{transform:translateY(-1632px)}
+21.134%{transform:translateY(-2176px)}
+21.806%{transform:translateY(-2720px)}
+22.241%{transform:translateY(-3264px)}
+22.903%{transform:translateY(-3808px)}
+23.347%{transform:translateY(-4352px)}
+24.039%{transform:translateY(-4896px)}
+24.701%{transform:translateY(-5440px)}
+25.175%{transform:translateY(-5984px)}
+25.580%{transform:translateY(-6528px)}
+26.223%{transform:translateY(-7072px)}
+26.904%{transform:translateY(-7616px)}
+27.319%{transform:translateY(-8160px)}
+27.991%{transform:translateY(-8704px)}
+28.446%{transform:translateY(-9248px)}
+28.890%{transform:translateY(-9792px)}
+29.098%{transform:translateY(-10336px)}
+29.118%{transform:translateY(-10880px)}
+29.167%{transform:translateY(-11424px)}
+58.897%{transform:translateY(-11968px)}
+69.687%{transform:translateY(-12512px)}
+70.191%{transform:translateY(-13056px)}
+70.240%{transform:translateY(-13600px)}
+90.080%{transform:translateY(-14144px)}
+90.120%{transform:translateY(-14688px)}
+100.000%{transform:translateY(-14688px)}
+            }
+
+            #screen_view {
+                animation-duration: 10121ms;
+                animation-iteration-count:infinite;
+                animation-name:roll;
+                animation-timing-function: steps(1,end);
+                animation-fill-mode: forwards;
+            }
+        ]]></style>
+        <style type="text/css" id="user-style">
+            /* The colors defined below are the default 16 colors used for rendering text of the terminal. Adjust
+               them as needed.
+               PowerShell colors based on https://en.wikipedia.org/wiki/ANSI_escape_code#Colors */
+            .foreground {fill: #cccccc;}
+            .background {fill: #0c0c0c;}
+            .color0 {fill: #0c0c0c;}
+            .color1 {fill: #c50f1f;}
+            .color2 {fill: #13a10e;}
+            .color3 {fill: #c19c00;}
+            .color4 {fill: #0037da;}
+            .color5 {fill: #881798;}
+            .color6 {fill: #3a96dd;}
+            .color7 {fill: #cccccc;}
+            .color8 {fill: #767676;}
+            .color9 {fill: #e74856;}
+            .color10 {fill: #16c60c;}
+            .color11 {fill: #f9f1a5;}
+            .color12 {fill: #3b78ff;}
+            .color13 {fill: #b4009e;}
+            .color14 {fill: #61d6d6;}
+            .color15 {fill: #f2f2f2;}
+        </style>
+    </defs>
+    <svg id="screen" width="976" height="510" viewBox="0 0 976 510" preserveAspectRatio="xMidYMin slice">
+    <rect class="background" height="100%" width="100%" x="0" y="0"/><defs><g id="g1"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="8" class="foreground"> </text><text x="40" textLength="8" class="background"> </text></g><g id="g2"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="16" class="foreground"> t</text><text x="48" textLength="8" class="background"> </text></g><g id="g3"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="24" class="foreground"> tk</text><text x="56" textLength="8" class="background"> </text></g><g id="g4"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="32" class="foreground"> tks</text><text x="64" textLength="8" class="background"> </text></g><g id="g5"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="40" class="foreground"> tks </text><text x="72" textLength="8" class="background"> </text></g><g id="g6"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="48" class="foreground"> tks l</text><text x="80" textLength="8" class="background"> </text></g><g id="g7"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="56" class="foreground"> tks li</text><text x="88" textLength="8" class="background"> </text></g><g id="g8"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="64" class="foreground"> tks lis</text><text x="96" textLength="8" class="background"> </text></g><g id="g9"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="72" class="foreground"> tks list</text><text x="104" textLength="8" class="background"> </text></g><g id="g10"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="80" class="foreground"> tks list </text><text x="112" textLength="8" class="background"> </text></g><g id="g11"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="88" class="foreground"> tks list c</text><text x="120" textLength="8" class="background"> </text></g><g id="g12"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="96" class="foreground"> tks list co</text><text x="128" textLength="8" class="background"> </text></g><g id="g13"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="104" class="foreground"> tks list con</text><text x="136" textLength="8" class="background"> </text></g><g id="g14"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="112" class="foreground"> tks list cont</text><text x="144" textLength="8" class="background"> </text></g><g id="g15"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="120" class="foreground"> tks list contr</text><text x="152" textLength="8" class="background"> </text></g><g id="g16"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="128" class="foreground"> tks list contro</text><text x="160" textLength="8" class="background"> </text></g><g id="g17"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="136" class="foreground"> tks list control</text><text x="168" textLength="8" class="background"> </text></g><g id="g18"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="144" class="foreground"> tks list control </text><text x="176" textLength="8" class="background"> </text></g><g id="g19"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="144" class="foreground"> tks list control </text></g><g id="g20"><text x="0" textLength="8" class="background"> </text></g><g id="g21"><text x="0" textLength="72" class="foreground">Controls:</text></g><g id="g22"><text x="0" textLength="376" class="foreground"> OP_TERMINATE - _T - Terminate tmux, script end</text></g><g id="g23"><text x="0" textLength="328" class="foreground"> OP_ATTACH - _A - Attach tmux, script end</text></g><g id="g24"><text x="0" textLength="472" class="foreground"> OP_DETACH - _D - Detach tmux, script end, default behavior</text></g><g id="g25"><text x="0" textLength="368" class="foreground"> OP_FINALLY - _F - Finally execute, script end</text></g><g id="g26"><text x="0" textLength="560" class="foreground"> OP_EXECUTE - _E - Execute line, no need to specify, default behaviour</text></g><g id="g27"><text x="0" textLength="208" class="foreground"> OP_INFO - _I - Print info</text></g><g id="g28"><text x="0" textLength="320" class="foreground"> OP_COMMENT - _C - Print comment, render</text></g><g id="g29"><text x="0" textLength="520" class="foreground"> OP_NO_PROMPT_WAIT - _N - Do not wait for prompt for last command</text></g><g id="g30"><text x="0" textLength="288" class="foreground"> OP_SLEEP - _S - Sleep for n seconds</text></g><g id="g31"><text x="0" textLength="328" class="foreground"> OP_REFRESH_PROMPT - _R - Load new prompt</text></g><g id="g32"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="16" class="foreground">  </text><text x="48" textLength="8" class="background"> </text></g><g id="g33"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="24" class="foreground">   </text><text x="56" textLength="8" class="background"> </text></g><g id="g34"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="24" class="foreground">   </text></g><g id="g35"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="48" class="foreground"></text></g><g id="g36"><text x="0" textLength="32" class="foreground"></text></g></defs><g id="screen_view"><g><rect x="40" y="0" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="0"/></g><g><rect x="48" y="544" width="8" height="17" class="foreground"/><use xlink:href="#g2" y="544"/></g><g><rect x="56" y="1088" width="8" height="17" class="foreground"/><use xlink:href="#g3" y="1088"/></g><g><rect x="64" y="1632" width="8" height="17" class="foreground"/><use xlink:href="#g4" y="1632"/></g><g><rect x="72" y="2176" width="8" height="17" class="foreground"/><use xlink:href="#g5" y="2176"/></g><g><rect x="80" y="2720" width="8" height="17" class="foreground"/><use xlink:href="#g6" y="2720"/></g><g><rect x="88" y="3264" width="8" height="17" class="foreground"/><use xlink:href="#g7" y="3264"/></g><g><rect x="96" y="3808" width="8" height="17" class="foreground"/><use xlink:href="#g8" y="3808"/></g><g><rect x="104" y="4352" width="8" height="17" class="foreground"/><use xlink:href="#g9" y="4352"/></g><g><rect x="112" y="4896" width="8" height="17" class="foreground"/><use xlink:href="#g10" y="4896"/></g><g><rect x="120" y="5440" width="8" height="17" class="foreground"/><use xlink:href="#g11" y="5440"/></g><g><rect x="128" y="5984" width="8" height="17" class="foreground"/><use xlink:href="#g12" y="5984"/></g><g><rect x="136" y="6528" width="8" height="17" class="foreground"/><use xlink:href="#g13" y="6528"/></g><g><rect x="144" y="7072" width="8" height="17" class="foreground"/><use xlink:href="#g14" y="7072"/></g><g><rect x="152" y="7616" width="8" height="17" class="foreground"/><use xlink:href="#g15" y="7616"/></g><g><rect x="160" y="8160" width="8" height="17" class="foreground"/><use xlink:href="#g16" y="8160"/></g><g><rect x="168" y="8704" width="8" height="17" class="foreground"/><use xlink:href="#g17" y="8704"/></g><g><rect x="176" y="9248" width="8" height="17" class="foreground"/><use xlink:href="#g18" y="9248"/></g><g><use xlink:href="#g19" y="9792"/><rect x="0" y="9809" width="8" height="17" class="foreground"/><use xlink:href="#g20" y="9809"/></g><g><use xlink:href="#g19" y="10336"/><use xlink:href="#g21" y="10353"/><use xlink:href="#g22" y="10370"/><use xlink:href="#g23" y="10387"/><use xlink:href="#g24" y="10404"/><use xlink:href="#g25" y="10421"/><use xlink:href="#g26" y="10438"/><use xlink:href="#g27" y="10455"/><use xlink:href="#g28" y="10472"/><use xlink:href="#g29" y="10489"/><use xlink:href="#g30" y="10506"/><use xlink:href="#g31" y="10523"/><rect x="0" y="10540" width="8" height="17" class="foreground"/><use xlink:href="#g20" y="10540"/></g><g><use xlink:href="#g19" y="10880"/><use xlink:href="#g21" y="10897"/><use xlink:href="#g22" y="10914"/><use xlink:href="#g23" y="10931"/><use xlink:href="#g24" y="10948"/><use xlink:href="#g25" y="10965"/><use xlink:href="#g26" y="10982"/><use xlink:href="#g27" y="10999"/><use xlink:href="#g28" y="11016"/><use xlink:href="#g29" y="11033"/><use xlink:href="#g30" y="11050"/><use xlink:href="#g31" y="11067"/><rect x="0" y="11084" width="8" height="17" class="foreground"/><use xlink:href="#g20" y="11084"/></g><g><use xlink:href="#g19" y="11424"/><use xlink:href="#g21" y="11441"/><use xlink:href="#g22" y="11458"/><use xlink:href="#g23" y="11475"/><use xlink:href="#g24" y="11492"/><use xlink:href="#g25" y="11509"/><use xlink:href="#g26" y="11526"/><use xlink:href="#g27" y="11543"/><use xlink:href="#g28" y="11560"/><use xlink:href="#g29" y="11577"/><use xlink:href="#g30" y="11594"/><use xlink:href="#g31" y="11611"/><rect x="40" y="11628" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="11628"/></g><g><use xlink:href="#g19" y="11968"/><use xlink:href="#g21" y="11985"/><use xlink:href="#g22" y="12002"/><use xlink:href="#g23" y="12019"/><use xlink:href="#g24" y="12036"/><use xlink:href="#g25" y="12053"/><use xlink:href="#g26" y="12070"/><use xlink:href="#g27" y="12087"/><use xlink:href="#g28" y="12104"/><use xlink:href="#g29" y="12121"/><use xlink:href="#g30" y="12138"/><use xlink:href="#g31" y="12155"/><rect x="48" y="12172" width="8" height="17" class="foreground"/><use xlink:href="#g32" y="12172"/></g><g><use xlink:href="#g19" y="12512"/><use xlink:href="#g21" y="12529"/><use xlink:href="#g22" y="12546"/><use xlink:href="#g23" y="12563"/><use xlink:href="#g24" y="12580"/><use xlink:href="#g25" y="12597"/><use xlink:href="#g26" y="12614"/><use xlink:href="#g27" y="12631"/><use xlink:href="#g28" y="12648"/><use xlink:href="#g29" y="12665"/><use xlink:href="#g30" y="12682"/><use xlink:href="#g31" y="12699"/><rect x="56" y="12716" width="8" height="17" class="foreground"/><use xlink:href="#g33" y="12716"/></g><g><use xlink:href="#g19" y="13056"/><use xlink:href="#g21" y="13073"/><use xlink:href="#g22" y="13090"/><use xlink:href="#g23" y="13107"/><use xlink:href="#g24" y="13124"/><use xlink:href="#g25" y="13141"/><use xlink:href="#g26" y="13158"/><use xlink:href="#g27" y="13175"/><use xlink:href="#g28" y="13192"/><use xlink:href="#g29" y="13209"/><use xlink:href="#g30" y="13226"/><use xlink:href="#g31" y="13243"/><use xlink:href="#g34" y="13260"/><rect x="0" y="13277" width="8" height="17" class="foreground"/><use xlink:href="#g20" y="13277"/></g><g><use xlink:href="#g19" y="13600"/><use xlink:href="#g21" y="13617"/><use xlink:href="#g22" y="13634"/><use xlink:href="#g23" y="13651"/><use xlink:href="#g24" y="13668"/><use xlink:href="#g25" y="13685"/><use xlink:href="#g26" y="13702"/><use xlink:href="#g27" y="13719"/><use xlink:href="#g28" y="13736"/><use xlink:href="#g29" y="13753"/><use xlink:href="#g30" y="13770"/><use xlink:href="#g31" y="13787"/><use xlink:href="#g34" y="13804"/><rect x="40" y="13821" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="13821"/></g><g><use xlink:href="#g19" y="14144"/><use xlink:href="#g21" y="14161"/><use xlink:href="#g22" y="14178"/><use xlink:href="#g23" y="14195"/><use xlink:href="#g24" y="14212"/><use xlink:href="#g25" y="14229"/><use xlink:href="#g26" y="14246"/><use xlink:href="#g27" y="14263"/><use xlink:href="#g28" y="14280"/><use xlink:href="#g29" y="14297"/><use xlink:href="#g30" y="14314"/><use xlink:href="#g31" y="14331"/><use xlink:href="#g34" y="14348"/><use xlink:href="#g35" y="14365"/><rect x="0" y="14382" width="8" height="17" class="foreground"/><use xlink:href="#g20" y="14382"/></g><g><use xlink:href="#g19" y="14688"/><use xlink:href="#g21" y="14705"/><use xlink:href="#g22" y="14722"/><use xlink:href="#g23" y="14739"/><use xlink:href="#g24" y="14756"/><use xlink:href="#g25" y="14773"/><use xlink:href="#g26" y="14790"/><use xlink:href="#g27" y="14807"/><use xlink:href="#g28" y="14824"/><use xlink:href="#g29" y="14841"/><use xlink:href="#g30" y="14858"/><use xlink:href="#g31" y="14875"/><use xlink:href="#g34" y="14892"/><use xlink:href="#g35" y="14909"/><use xlink:href="#g36" y="14926"/><rect x="0" y="14943" width="8" height="17" class="foreground"/><use xlink:href="#g20" y="14943"/></g></g></svg>
+</svg>

@@ -1,0 +1,28 @@
+reset
+termtosvg ../07_tks.svg
+reset
+banner " " " " "tks :" "kubectl" "variables" | lolcat
+
+# tks has list of kubectl specific template variables
+# template variables are enclosed by {{ and }}
+# you can list what kubectl templated variables are
+kubectl tks list kctl
+     
+# for readability there are long {{k8s_ template variables
+kubectl tks -n test-run start -l app=nginx  "kubectl -n {{k8s_namespace}} exec -t {{k8s_pod}} -c nginx -- env" -T
+
+# for one-liners there are short {{nsp}}, {{pod}} , {{ctx}} , {{cnf}} template variables
+kubectl tks -n test-run start -l app=nginx  "kubectl -n {{nsp}} exec -t {{pod}} -c nginx -- env" -T
+
+# it is always simpler to specify _ (internal shortcut) then whole kubectl section
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ; echo {{pod}}" -T -d
+
+# as _ is adaptable to different ways of running kubectl
+kubectl tks --context minikube -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ; echo {{pod}}" -T -d
+
+# _ works in more flexible way, if you provide context or config file _ will show them,
+# those that are not specified will not be used 
+# ie script will use same key parameters as your kubectl without pluing did
+#    
+exit
+

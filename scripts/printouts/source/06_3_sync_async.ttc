@@ -1,0 +1,5 @@
+termtosvg ../s_06_3_tks.svg
+tks -n test-run start -l app=nginx 'X=$(($RANDOM % 20));sleep $X;echo ABCD;sleep $X;echo XYZW {{pod}}' -q -T -s 
+#C ~/bin/wait_prompt.sh " ~ $"
+
+exit

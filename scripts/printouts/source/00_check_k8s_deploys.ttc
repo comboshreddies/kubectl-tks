@@ -1,0 +1,5 @@
+termtosvg ../s_00_tks.svg
+kubectl -n test-run get pod --show-labels 
+kubectl -n test-run get pod -l app=nginx 
+ 
+exit

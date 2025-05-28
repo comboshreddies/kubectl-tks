@@ -1,0 +1,6 @@
+termtosvg ../s_14_1_tks.svg
+kubectl tks -n test-run start tcpdump-all -l app=nginx -q  
+#C ~/bin/wait_prompt.sh " ~ $"
+ls -l *.pcap.gz 
+ 
+exit

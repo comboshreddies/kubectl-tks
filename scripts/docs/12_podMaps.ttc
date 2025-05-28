@@ -1,0 +1,31 @@
+reset
+termtosvg ../12_tks.svg
+reset
+banner " " " " tks "podMap" | lolcat
+
+# check podMap section of sequence.json for p2c item
+cat ~/.tks/sequences.json| jq ".podMap.p2c"
+
+# or via tks
+kubectl tks list podMap
+
+# podMaps are used for mapping pod name to some other value
+# podMap section makes your script/shortcuts work on various kinds of pods/containers
+# they use regular expression on right side and map to left side
+# for example if you have two pods, one having /bin/sh and other /bin/bash
+# you can check p2sh podConverter item, it will map nginx to /bin/bash and
+# any other to /bin/sh, 
+# if those two pods have different name of a container
+# you want to exec to, you should check p2c section
+# if pods have different container for logging (other than main execution container)
+# you can check podMap p2cLogs
+
+# by checking example script tcptump-all you can see how podMaps are being used
+tks info tcpdump-all
+# yet no podConverter will be replaced with -x option
+# as podConverter depend on pod name, and pod name is avalable only runtime
+# (so use start and -d for dry run)
+tks -n test-run start -l app=nginx tcpdump-all -d
+#    
+exit
+

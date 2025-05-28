@@ -1,0 +1,14 @@
+termtosvg ../s_05_4_tks.svg
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ;{{OP_ATTACH}}" -T 
+
+#C ssh gdt "tmux previous-window -t OneLiner--test-run"
+
+#C ssh gdt tmux previous-window -t OneLiner--test-run
+
+#C ssh gdt tmux previous-window -t OneLiner--test-run 
+
+#C ssh gdt "tmux detach-client -s OneLiner--test-run"
+
+tmux ls 
+ 
+exit

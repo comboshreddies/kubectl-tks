@@ -1,0 +1,4 @@
+termtosvg ../s_06_2_tks.svg
+tks -n test-run start -l app=nginx "echo ABCD {{pod}}; echo XYZW {{pod}}" -T -d 
+  
+exit

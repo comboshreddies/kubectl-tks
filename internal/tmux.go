@@ -73,7 +73,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 				fmt.Printf("terminating previous session\n")
 			}
 		} else {
-			fmt.Printf("exiting\n")
+			fmt.Printf("tmux session exists, exiting\n")
 			return
 		}
 	}

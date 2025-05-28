@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="terminal" baseProfile="full" viewBox="0 0 976 512" width="976" version="1.1">
+    <defs>
+        <termtosvg:template_settings xmlns:termtosvg="https://github.com/nbedos/termtosvg">
+            <termtosvg:screen_geometry columns="122" rows="30"/>
+            <termtosvg:animation type="css"/>
+        </termtosvg:template_settings>
+        <style type="text/css" id="generated-style"><![CDATA[#screen {
+                font-family: 'DejaVu Sans Mono', monospace;
+                font-style: normal;
+                font-size: 14px;
+            }
+
+        text {
+            dominant-baseline: text-before-edge;
+            white-space: pre;
+        }
+    
+            :root {
+                --animation-duration: 8611ms;
+            }
+
+            @keyframes roll {
+                0.000%{transform:translateY(0px)}
+22.878%{transform:translateY(-544px)}
+23.644%{transform:translateY(-1088px)}
+24.469%{transform:translateY(-1632px)}
+25.026%{transform:translateY(-2176px)}
+25.549%{transform:translateY(-2720px)}
+26.315%{transform:translateY(-3264px)}
+26.815%{transform:translateY(-3808px)}
+27.558%{transform:translateY(-4352px)}
+28.382%{transform:translateY(-4896px)}
+28.905%{transform:translateY(-5440px)}
+29.126%{transform:translateY(-5984px)}
+29.160%{transform:translateY(-6528px)}
+29.207%{transform:translateY(-7072px)}
+64.209%{transform:translateY(-7616px)}
+64.952%{transform:translateY(-8160px)}
+64.987%{transform:translateY(-8704px)}
+88.387%{transform:translateY(-9248px)}
+100.000%{transform:translateY(-9248px)}
+            }
+
+            #screen_view {
+                animation-duration: 8611ms;
+                animation-iteration-count:infinite;
+                animation-name:roll;
+                animation-timing-function: steps(1,end);
+                animation-fill-mode: forwards;
+            }
+        ]]></style>
+        <style type="text/css" id="user-style">
+            /* The colors defined below are the default 16 colors used for rendering text of the terminal. Adjust
+               them as needed.
+               PowerShell colors based on https://en.wikipedia.org/wiki/ANSI_escape_code#Colors */
+            .foreground {fill: #cccccc;}
+            .background {fill: #0c0c0c;}
+            .color0 {fill: #0c0c0c;}
+            .color1 {fill: #c50f1f;}
+            .color2 {fill: #13a10e;}
+            .color3 {fill: #c19c00;}
+            .color4 {fill: #0037da;}
+            .color5 {fill: #881798;}
+            .color6 {fill: #3a96dd;}
+            .color7 {fill: #cccccc;}
+            .color8 {fill: #767676;}
+            .color9 {fill: #e74856;}
+            .color10 {fill: #16c60c;}
+            .color11 {fill: #f9f1a5;}
+            .color12 {fill: #3b78ff;}
+            .color13 {fill: #b4009e;}
+            .color14 {fill: #61d6d6;}
+            .color15 {fill: #f2f2f2;}
+        </style>
+    </defs>
+    <svg id="screen" width="976" height="510" viewBox="0 0 976 510" preserveAspectRatio="xMidYMin slice">
+    <rect class="background" height="100%" width="100%" x="0" y="0"/><defs><g id="g1"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="8" class="foreground"> </text><text x="40" textLength="8" class="background"> </text></g><g id="g2"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="16" class="foreground"> t</text><text x="48" textLength="8" class="background"> </text></g><g id="g3"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="24" class="foreground"> tk</text><text x="56" textLength="8" class="background"> </text></g><g id="g4"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="32" class="foreground"> tks</text><text x="64" textLength="8" class="background"> </text></g><g id="g5"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="40" class="foreground"> tks </text><text x="72" textLength="8" class="background"> </text></g><g id="g6"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="48" class="foreground"> tks l</text><text x="80" textLength="8" class="background"> </text></g><g id="g7"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="56" class="foreground"> tks li</text><text x="88" textLength="8" class="background"> </text></g><g id="g8"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="64" class="foreground"> tks lis</text><text x="96" textLength="8" class="background"> </text></g><g id="g9"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="72" class="foreground"> tks list</text><text x="104" textLength="8" class="background"> </text></g><g id="g10"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="80" class="foreground"> tks list </text><text x="112" textLength="8" class="background"> </text></g><g id="g11"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="80" class="foreground"> tks list </text></g><g id="g12"><text x="0" textLength="8" class="background"> </text></g><g id="g13"><text x="0" textLength="400" class="foreground">Error: requires at least 1 arg(s), only received 0</text></g><g id="g14"><text x="0" textLength="48" class="foreground">Usage:</text></g><g id="g15"><text x="0" textLength="520" class="foreground">  kubect-tks list [scripts|shortcuts|podMap|control|kctl] [flags]</text></g><g id="g16"><text x="0" textLength="48" class="foreground">Flags:</text></g><g id="g17"><text x="0" textLength="328" class="foreground">  -h, --help                help for list</text></g><g id="g18"><text x="0" textLength="640" class="foreground">  -f, --scriptFile string   scriptFile (default is $HOME/.tmux-k8s-scripts.yaml)</text></g><g id="g19"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="16" class="foreground">  </text><text x="48" textLength="8" class="background"> </text></g><g id="g20"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="16" class="foreground">  </text></g><g id="g21"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="48" class="foreground"></text></g><g id="g22"><text x="0" textLength="32" class="foreground"></text></g></defs><g id="screen_view"><g><rect x="40" y="0" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="0"/></g><g><rect x="48" y="544" width="8" height="17" class="foreground"/><use xlink:href="#g2" y="544"/></g><g><rect x="56" y="1088" width="8" height="17" class="foreground"/><use xlink:href="#g3" y="1088"/></g><g><rect x="64" y="1632" width="8" height="17" class="foreground"/><use xlink:href="#g4" y="1632"/></g><g><rect x="72" y="2176" width="8" height="17" class="foreground"/><use xlink:href="#g5" y="2176"/></g><g><rect x="80" y="2720" width="8" height="17" class="foreground"/><use xlink:href="#g6" y="2720"/></g><g><rect x="88" y="3264" width="8" height="17" class="foreground"/><use xlink:href="#g7" y="3264"/></g><g><rect x="96" y="3808" width="8" height="17" class="foreground"/><use xlink:href="#g8" y="3808"/></g><g><rect x="104" y="4352" width="8" height="17" class="foreground"/><use xlink:href="#g9" y="4352"/></g><g><rect x="112" y="4896" width="8" height="17" class="foreground"/><use xlink:href="#g10" y="4896"/></g><g><use xlink:href="#g11" y="5440"/><rect x="0" y="5457" width="8" height="17" class="foreground"/><use xlink:href="#g12" y="5457"/></g><g><use xlink:href="#g11" y="5984"/><use xlink:href="#g13" y="6001"/><use xlink:href="#g14" y="6018"/><use xlink:href="#g15" y="6035"/><use xlink:href="#g16" y="6069"/><use xlink:href="#g17" y="6086"/><use xlink:href="#g18" y="6103"/><rect x="0" y="6137" width="8" height="17" class="foreground"/><use xlink:href="#g12" y="6137"/></g><g><use xlink:href="#g11" y="6528"/><use xlink:href="#g13" y="6545"/><use xlink:href="#g14" y="6562"/><use xlink:href="#g15" y="6579"/><use xlink:href="#g16" y="6613"/><use xlink:href="#g17" y="6630"/><use xlink:href="#g18" y="6647"/><rect x="0" y="6681" width="8" height="17" class="foreground"/><use xlink:href="#g12" y="6681"/></g><g><use xlink:href="#g11" y="7072"/><use xlink:href="#g13" y="7089"/><use xlink:href="#g14" y="7106"/><use xlink:href="#g15" y="7123"/><use xlink:href="#g16" y="7157"/><use xlink:href="#g17" y="7174"/><use xlink:href="#g18" y="7191"/><rect x="40" y="7225" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="7225"/></g><g><use xlink:href="#g11" y="7616"/><use xlink:href="#g13" y="7633"/><use xlink:href="#g14" y="7650"/><use xlink:href="#g15" y="7667"/><use xlink:href="#g16" y="7701"/><use xlink:href="#g17" y="7718"/><use xlink:href="#g18" y="7735"/><rect x="48" y="7769" width="8" height="17" class="foreground"/><use xlink:href="#g19" y="7769"/></g><g><use xlink:href="#g11" y="8160"/><use xlink:href="#g13" y="8177"/><use xlink:href="#g14" y="8194"/><use xlink:href="#g15" y="8211"/><use xlink:href="#g16" y="8245"/><use xlink:href="#g17" y="8262"/><use xlink:href="#g18" y="8279"/><use xlink:href="#g20" y="8313"/><rect x="0" y="8330" width="8" height="17" class="foreground"/><use xlink:href="#g12" y="8330"/></g><g><use xlink:href="#g11" y="8704"/><use xlink:href="#g13" y="8721"/><use xlink:href="#g14" y="8738"/><use xlink:href="#g15" y="8755"/><use xlink:href="#g16" y="8789"/><use xlink:href="#g17" y="8806"/><use xlink:href="#g18" y="8823"/><use xlink:href="#g20" y="8857"/><rect x="40" y="8874" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="8874"/></g><g><use xlink:href="#g11" y="9248"/><use xlink:href="#g13" y="9265"/><use xlink:href="#g14" y="9282"/><use xlink:href="#g15" y="9299"/><use xlink:href="#g16" y="9333"/><use xlink:href="#g17" y="9350"/><use xlink:href="#g18" y="9367"/><use xlink:href="#g20" y="9401"/><use xlink:href="#g21" y="9418"/><use xlink:href="#g22" y="9435"/><rect x="0" y="9452" width="8" height="17" class="foreground"/><use xlink:href="#g12" y="9452"/></g></g></svg>
+</svg>

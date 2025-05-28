@@ -11,7 +11,7 @@ and if you frequently and on many different pods namespaces, cluster, then
 this tool might be helpful.
 
 With this tool you can:
-1) run any command for specific pod selections, like: 
+1) run oneliners and (more powerful) scripts with template engine for kubernetes
 ```console
 "exec {{pod}} -c {{p2c}}  -- /bin/sh `env > {{k8s_pod}}.env`"
 ```
@@ -19,9 +19,9 @@ tks will automatically change pod name namespace and for each execution step
 
 2) you can select by namespace, label, then filter specific pods, like:
 ```console
-kubectl tks --context minikube -n test-run start env -l app=nginx
-kubectl tks --context minikube -n test-run start env -p busybox1,busybox2
-kubectl tks --context minikube -n test-run start env -l app=busybox -p busybox1,busybox2
+kubectl tks --context minikube -n test-run start tcpdump-all -l app=nginx
+kubectl tks --context minikube -n test-run start tcpdump-all -p busybox1,busybox2
+kubectl tks --context minikube -n test-run start tcpdump-all -l app=busybox -p busybox1,busybox2
 ```
 
 3) You can decide would you like to terminate, attach tmux or do some command at the and of execution
@@ -60,25 +60,14 @@ To practice first steps create a deployment
 ```console
 kubectl create ns test-run
 kubectl -n test-run apply -f k8s_yamls/sample_deploy1.yaml
-kubectl -n test-run get pod --show-labels
 ```
 
-```
-NAME                             READY   STATUS    RESTARTS   AGE   LABELS
-nginx-sample1-6475dd48b7-bgtsx   1/1     Running   0          2m   app=nginx,pod-template-hash=6475dd48b7,ver=v1
-nginx-sample1-6475dd48b7-br6jc   1/1     Running   0          2m   app=nginx,pod-template-hash=6475dd48b7,ver=v1
-nginx-sample1-6475dd48b7-n6mtg   1/1     Running   0          2m   app=nginx,pod-template-hash=6475dd48b7,ver=v1
-```
-
+then verify is everything up
 ```console
+kubectl -n test-run get pod
 kubectl -n test-run get pod -l app=nginx
 ```
-```
-NAME                             READY   STATUS    RESTARTS   AGE
-nginx-sample1-6475dd48b7-bgtsx   1/1     Running   0          2m 
-nginx-sample1-6475dd48b7-br6jc   1/1     Running   0          2m
-nginx-sample1-6475dd48b7-n6mtg   1/1     Running   0          2m
-```
+![s_00_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_00_tks.svg?raw=true)
 
 
 ## One-liner example
@@ -86,35 +75,53 @@ nginx-sample1-6475dd48b7-n6mtg   1/1     Running   0          2m
 
 One-liner example is nice way to start but real power comes with scripts that are tailored for purpose.
 
-Let's run simple one-liner
+One-liners are designed to be short, but they might not be easily readable. Power
+of one-liners come with prepared scripts and shortcuts, but will start with empty state
+(so no ~/.tks/sequences.json for a start, we will add those later)
+here is simple one liner that executes env for each pod in nginx container
+We will use start command, and pods will be selected with -l app=nginx
+
 ```console
-kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- env"
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env"
 ```
-```
-# Unable to read conf file /Users/none/.tks/sequences.json, assuming oneLiner
-# unable to open sequence json file /Users/none/.tks/sequences.json
-#### Creating new session OneLiner--test-run
-#### Creating windows per pod
-#### Collecting prompts for each window
-#### Starting execution: sync : false, dry : false
-#EXECUTE #0 nginx-sample1-6475dd48b7-br6jc: kubectl -n test-run exec nginx-sample1-6475dd48b7-br6jc -c nginx -- env
-#EXECUTE #0 nginx-sample1-6475dd48b7-n6mtg: kubectl -n test-run exec nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
-#EXECUTE #0 nginx-sample1-6475dd48b7-bgtsx: kubectl -n test-run exec nginx-sample1-6475dd48b7-bgtsx -c nginx -- env
-#COMPLETED
-```
-You can check what has been executed by attaching to tmux
-```console
-tmux a
-```
+![s_01_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_01_tks.svg?raw=true)
+
+Attaching to tmux shows execution results for each pod - each pod one tmux window/pane.
+
+Explanation:
+
+start command will try to find a script within ~/.tks/sequences.json
+as there is no script named "_ exec {{pod}} -c nginx -- env", it
+will assume argument is not a script name but one-liner
+
+_ shortcut will run kubectl with same kubectl switches (--context, -n, --kubeconfig)
+as tks was executed, so in this case _ will be replaced with
+"kubectl -n test-run"
+
+for each pod new tmux window will be created, and script
+kubectl -n test-run exec {{pod}} -c nginx -- env
+
+will be executed for each pod, replacing {{pod}} with specific pod name
+new tmux session OneLiner--test-run is created with base window
 underscore (ie _ ) sign is used to repeat same --context --namespace --kubeconfig parameters as tks was called out,
 so in this case "_ exec {{k8s_pod}} -c nginx -- env"  _ is replaced with kubectl -n test-run.
 
 
 ## one-liner leaves tmux session open
-if you run same command second time (and if you have not terminated previous tmux session) you will get
+
+Second run of same one-liner will try to open same session name and might (if you have not terminated
+previous tmux session)  fail with error, as one-liners might have overlapping session-names and you 
+can't open tmux with same session name
+
+Tks tool creates tmux session kubectl context, kubectl namespace, and script name.
+One liners are treaded as unnamed script anems , and for one-liners
+script name is always "OneLiner".
+
+Let's try to run another one-liner on same namespace and context and check the error:
 ```console
 kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- env"
 ```
+![s_02_1_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_02_1_tks.svg?raw=true)
 ```
 # Unable to read conf file /Users/none/.tks/sequences.json, assuming oneLiner
 # unable to open sequence json file /Users/none/.tks/sequences.json
@@ -125,6 +132,9 @@ you can use
 tmux ls
 ```
 to check what sessions are running.
+
+if you want to use different tmux session name, use start command
+with -S <your session name>
 
 
 ## one-liner with previous session removal

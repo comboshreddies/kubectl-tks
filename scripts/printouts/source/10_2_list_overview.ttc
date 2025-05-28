@@ -1,0 +1,4 @@
+termtosvg ../s_10_2_tks.svg
+tks list kctl 
+ 
+exit

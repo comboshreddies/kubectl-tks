@@ -6,12 +6,11 @@
       "main": ".*"
     },
     "p2cLogs": {
-      "busybox": "logs",
+      "busybox": "logs.*",
       "main": ".*"
     },
     "p2sh": {
-      "/bin/sh": "logs",
-      "/bin/bash" : "nginx",
+      "/bin/bash" : "nginx.*",
       "/bin/sh": ".*"
     }
   },
@@ -22,7 +21,8 @@
     "EC" : "_ exec {{pod}} -c {{p2c}} --",
     "EIC" : "_ exec -it {{pod}} -c {{p2c}} --",
     "ECB" : "_ exec {{pod}} -c {{p2c}} -- /bin/bash -c ",
-    "ECBS" : "_ exec -it -c {{p2c}} -- {{p2sh}} -c ",
+    "ECBS" : "_ exec {{pod}} -c {{p2c}} -- {{p2sh}}",
+    "EICBS" : "_ exec -it {{pod}} -c {{p2c}} -- {{p2sh}}",
     "LC" : "_ logs -f {{LOGS_SWITCHES}} {{pod}} -c {{p2cLog}}",
     "ECB": "{{EC}} /bin/bash -c "
   },
@@ -64,7 +64,7 @@
       "{{OP_TERMINATE}}"
     ],
     "tcpdump-all": [
-      "{{OP_INFO}} tcpdump on any interface all traffic for 300 seconds or 100k packets",
+      "{{OP_INFO}} tcpdump on any interface all traffic for 10 seconds or 1000 packets",
       "{{ECB}} \"apt -y update && apt -y install tcpdump\"",
       "{{ECB}} \"timeout 10 tcpdump -i any -w /tmp/{{k8s_pod}}.pcap -s65535 -c 1000\"",
       "{{ECB}} \"rm -f /tmp/{{k8s_pod}.pcap.gz && cd /tmp && gzip {{k8s_pod}}.pcap\"",
@@ -163,12 +163,11 @@
       "{{OP_FINALLY}} echo done > /tmp/x"
     ],
     "remote-exec": [
-      "{{_I}} example of attaching to remote host with different prompt",
-      "{{ECB}}",
+      "{{OP_INFO}} example of attaching to remote host with different prompt",
+      "{{EICBS}}",
       "{{OP_NO_PROMPT_WAIT}}",
       "{{OP_REFRESH_PROMPT}}",
-      "sleep 20",
-      "sleep 10",
+      "date",
       "hostname",
       "exit",
       "{{OP_NO_PROMPT_WAIT}}",

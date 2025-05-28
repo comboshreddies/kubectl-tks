@@ -1,0 +1,4 @@
+termtosvg ../s_07_5_tks.svg
+kubectl tks --context minikube -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ; echo {{pod}}" -T -d 
+ 
+exit

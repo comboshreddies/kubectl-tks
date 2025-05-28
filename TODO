@@ -13,7 +13,6 @@ feature:
 * In k8s.go consider recording containers name list []string, currently not needed, maybe for
 some additional functionality
 * add kct_cli shortcut that replaces field with kubectl switch options (same as _ but without kubectl)
-* consider attach as not terminal operation
 
 architecture:
 * switch to managing windows by pod-name not by index (as index can change)

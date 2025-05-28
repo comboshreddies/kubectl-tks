@@ -1,0 +1,26 @@
+reset
+termtosvg ../10_tks.svg
+reset
+banner " " " " "tks :" "list" "overview" | lolcat 
+
+# show tks available list options
+tks list
+
+# list kubectl template variables - internally implemented
+tks list kctl
+
+# list control - controls are internally implemented
+tks list control
+
+# list scripts
+tks list scripts
+
+# list shortcuts  - more in next chapters
+tks list shortcuts
+
+#list podConverter - more in next chapters 
+tks list podConverter
+
+#    
+exit
+

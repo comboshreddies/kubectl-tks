@@ -1,0 +1,5 @@
+termtosvg ../s_09_3_tks.svg
+tks info env-nginx-simple -x 
+ 
+exit
+

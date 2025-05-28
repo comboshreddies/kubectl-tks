@@ -1,0 +1,21 @@
+reset
+termtosvg ../13_tks.svg
+reset
+banner " " " " "tks : info" "and" "version" | lolcat 
+
+# checking content of env-nginx-simple script
+tks info env-nginx-simple
+
+# checking rendered content of env-nginx-simple script
+# by adding -x flag 
+tks info env-nginx-simple -x
+
+# note: only shortcuts will be rendered as k8s/kctl variables are runtime
+# to verify runtime template variable rendering do start with -d/dryrun option
+
+# also you can check tks version
+tks version
+#    
+exit
+
+

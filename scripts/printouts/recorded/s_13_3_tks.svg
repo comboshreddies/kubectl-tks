@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="terminal" baseProfile="full" viewBox="0 0 976 512" width="976" version="1.1">
+    <defs>
+        <termtosvg:template_settings xmlns:termtosvg="https://github.com/nbedos/termtosvg">
+            <termtosvg:screen_geometry columns="122" rows="30"/>
+            <termtosvg:animation type="css"/>
+        </termtosvg:template_settings>
+        <style type="text/css" id="generated-style"><![CDATA[#screen {
+                font-family: 'DejaVu Sans Mono', monospace;
+                font-style: normal;
+                font-size: 14px;
+            }
+
+        text {
+            dominant-baseline: text-before-edge;
+            white-space: pre;
+        }
+    
+            :root {
+                --animation-duration: 8805ms;
+            }
+
+            @keyframes roll {
+                0.000%{transform:translateY(0px)}
+22.374%{transform:translateY(-544px)}
+23.146%{transform:translateY(-1088px)}
+23.918%{transform:translateY(-1632px)}
+24.418%{transform:translateY(-2176px)}
+25.168%{transform:translateY(-2720px)}
+25.667%{transform:translateY(-3264px)}
+26.440%{transform:translateY(-3808px)}
+26.894%{transform:translateY(-4352px)}
+27.621%{transform:translateY(-4896px)}
+28.393%{transform:translateY(-5440px)}
+28.870%{transform:translateY(-5984px)}
+29.642%{transform:translateY(-6528px)}
+30.142%{transform:translateY(-7072px)}
+30.369%{transform:translateY(-7616px)}
+30.403%{transform:translateY(-8160px)}
+64.747%{transform:translateY(-8704px)}
+65.474%{transform:translateY(-9248px)}
+88.631%{transform:translateY(-9792px)}
+88.643%{transform:translateY(-10336px)}
+100.000%{transform:translateY(-10336px)}
+            }
+
+            #screen_view {
+                animation-duration: 8805ms;
+                animation-iteration-count:infinite;
+                animation-name:roll;
+                animation-timing-function: steps(1,end);
+                animation-fill-mode: forwards;
+            }
+        ]]></style>
+        <style type="text/css" id="user-style">
+            /* The colors defined below are the default 16 colors used for rendering text of the terminal. Adjust
+               them as needed.
+               PowerShell colors based on https://en.wikipedia.org/wiki/ANSI_escape_code#Colors */
+            .foreground {fill: #cccccc;}
+            .background {fill: #0c0c0c;}
+            .color0 {fill: #0c0c0c;}
+            .color1 {fill: #c50f1f;}
+            .color2 {fill: #13a10e;}
+            .color3 {fill: #c19c00;}
+            .color4 {fill: #0037da;}
+            .color5 {fill: #881798;}
+            .color6 {fill: #3a96dd;}
+            .color7 {fill: #cccccc;}
+            .color8 {fill: #767676;}
+            .color9 {fill: #e74856;}
+            .color10 {fill: #16c60c;}
+            .color11 {fill: #f9f1a5;}
+            .color12 {fill: #3b78ff;}
+            .color13 {fill: #b4009e;}
+            .color14 {fill: #61d6d6;}
+            .color15 {fill: #f2f2f2;}
+        </style>
+    </defs>
+    <svg id="screen" width="976" height="510" viewBox="0 0 976 510" preserveAspectRatio="xMidYMin slice">
+    <rect class="background" height="100%" width="100%" x="0" y="0"/><defs><g id="g1"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="8" class="foreground"> </text><text x="40" textLength="8" class="background"> </text></g><g id="g2"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="16" class="foreground"> t</text><text x="48" textLength="8" class="background"> </text></g><g id="g3"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="24" class="foreground"> tk</text><text x="56" textLength="8" class="background"> </text></g><g id="g4"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="32" class="foreground"> tks</text><text x="64" textLength="8" class="background"> </text></g><g id="g5"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="40" class="foreground"> tks </text><text x="72" textLength="8" class="background"> </text></g><g id="g6"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="48" class="foreground"> tks v</text><text x="80" textLength="8" class="background"> </text></g><g id="g7"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="56" class="foreground"> tks ve</text><text x="88" textLength="8" class="background"> </text></g><g id="g8"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="64" class="foreground"> tks ver</text><text x="96" textLength="8" class="background"> </text></g><g id="g9"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="72" class="foreground"> tks vers</text><text x="104" textLength="8" class="background"> </text></g><g id="g10"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="80" class="foreground"> tks versi</text><text x="112" textLength="8" class="background"> </text></g><g id="g11"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="88" class="foreground"> tks versio</text><text x="120" textLength="8" class="background"> </text></g><g id="g12"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="96" class="foreground"> tks version</text><text x="128" textLength="8" class="background"> </text></g><g id="g13"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="104" class="foreground"> tks version </text><text x="136" textLength="8" class="background"> </text></g><g id="g14"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="104" class="foreground"> tks version </text></g><g id="g15"><text x="0" textLength="8" class="background"> </text></g><g id="g16"><text x="0" textLength="48" class="foreground">v0.8.6</text></g><g id="g17"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="16" class="foreground">  </text><text x="48" textLength="8" class="background"> </text></g><g id="g18"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="16" class="foreground">  </text></g><g id="g19"><text x="0" textLength="32" font-weight="bold" class="color12"> ~ $</text><text x="32" textLength="48" class="foreground"></text></g><g id="g20"><text x="0" textLength="32" class="foreground"></text></g></defs><g id="screen_view"><g><rect x="40" y="0" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="0"/></g><g><rect x="48" y="544" width="8" height="17" class="foreground"/><use xlink:href="#g2" y="544"/></g><g><rect x="56" y="1088" width="8" height="17" class="foreground"/><use xlink:href="#g3" y="1088"/></g><g><rect x="64" y="1632" width="8" height="17" class="foreground"/><use xlink:href="#g4" y="1632"/></g><g><rect x="72" y="2176" width="8" height="17" class="foreground"/><use xlink:href="#g5" y="2176"/></g><g><rect x="80" y="2720" width="8" height="17" class="foreground"/><use xlink:href="#g6" y="2720"/></g><g><rect x="88" y="3264" width="8" height="17" class="foreground"/><use xlink:href="#g7" y="3264"/></g><g><rect x="96" y="3808" width="8" height="17" class="foreground"/><use xlink:href="#g8" y="3808"/></g><g><rect x="104" y="4352" width="8" height="17" class="foreground"/><use xlink:href="#g9" y="4352"/></g><g><rect x="112" y="4896" width="8" height="17" class="foreground"/><use xlink:href="#g10" y="4896"/></g><g><rect x="120" y="5440" width="8" height="17" class="foreground"/><use xlink:href="#g11" y="5440"/></g><g><rect x="128" y="5984" width="8" height="17" class="foreground"/><use xlink:href="#g12" y="5984"/></g><g><rect x="136" y="6528" width="8" height="17" class="foreground"/><use xlink:href="#g13" y="6528"/></g><g><use xlink:href="#g14" y="7072"/><rect x="0" y="7089" width="8" height="17" class="foreground"/><use xlink:href="#g15" y="7089"/></g><g><use xlink:href="#g14" y="7616"/><use xlink:href="#g16" y="7633"/><rect x="0" y="7650" width="8" height="17" class="foreground"/><use xlink:href="#g15" y="7650"/></g><g><use xlink:href="#g14" y="8160"/><use xlink:href="#g16" y="8177"/><rect x="40" y="8194" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="8194"/></g><g><use xlink:href="#g14" y="8704"/><use xlink:href="#g16" y="8721"/><rect x="48" y="8738" width="8" height="17" class="foreground"/><use xlink:href="#g17" y="8738"/></g><g><use xlink:href="#g14" y="9248"/><use xlink:href="#g16" y="9265"/><use xlink:href="#g18" y="9282"/><rect x="40" y="9299" width="8" height="17" class="foreground"/><use xlink:href="#g1" y="9299"/></g><g><use xlink:href="#g14" y="9792"/><use xlink:href="#g16" y="9809"/><use xlink:href="#g18" y="9826"/><use xlink:href="#g19" y="9843"/><rect x="0" y="9860" width="8" height="17" class="foreground"/><use xlink:href="#g15" y="9860"/></g><g><use xlink:href="#g14" y="10336"/><use xlink:href="#g16" y="10353"/><use xlink:href="#g18" y="10370"/><use xlink:href="#g19" y="10387"/><use xlink:href="#g20" y="10404"/><rect x="0" y="10421" width="8" height="17" class="foreground"/><use xlink:href="#g15" y="10421"/></g></g></svg>
+</svg>

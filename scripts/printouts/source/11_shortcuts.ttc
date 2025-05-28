@@ -1,0 +1,4 @@
+termtosvg ../s_11_tks.svg
+kubectl tks -n test-run start -l app=nginx "{{ECB}} date" -T -d 
+ 
+exit

@@ -1,0 +1,25 @@
+tmux kill-session
+tmux kill-session
+tmux kill-session
+termtosvg ../s_14_2_tks.svg
+kubectl tks -n test-run start remote-exec -l app=nginx -q 
+
+#C ~/bin/wait_prompt.sh " ~ $"
+tmux ls
+
+tmux attach -t remote-exec--test-run
+#C tmux send-keys -t 0 "# prev screen - ctrl+b + p"
+
+#C ssh gdt tmux previous-window -t remote-exec--test-run
+#C tmux send-keys -t 0 "# prev screen - ctrl+b + p"
+
+#C ssh gdt tmux previous-window -t remote-exec--test-run
+#C tmux send-keys -t 0 "# prev screen - ctrl+b + p"
+
+#C ssh gdt tmux previous-window -t remote-exec--test-run
+
+#C tmux send-keys -t 0 "# detach from tmux"
+
+#C ssh gdt "tmux detach-client -s remote-exec--test-run"
+ 
+exit

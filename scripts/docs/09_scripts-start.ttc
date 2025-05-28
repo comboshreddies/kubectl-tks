@@ -1,0 +1,36 @@
+reset
+termtosvg ../09_tks.svg
+reset
+banner " " " " "tks :" "scripts" "start" | lolcat
+
+# here is a list of scripts that are read from sequence.json
+tks list scripts
+
+# here we can extract script from json file
+cat ~/.tks/sequences.json| jq ".scripts.\"env-nginx-simple\""
+
+# here is how to do same with tks info
+tks info env-nginx-simple
+
+# with -x you can render shortcuts within a script
+tks info env-nginx-simple -x
+
+# k8s_ template variables will stay unredered, as they are available runtime
+# so we can check with -d
+kubectl tks -n test-run start env-nginx-simple -l app=nginx -T -d
+
+# now we can run script
+kubectl tks -n test-run start env-nginx-simple -l app=nginx -T
+
+# check what is in our present working directory
+ls -l
+
+# and what is in fetched env file
+cat $(ls nginx-sample1-* | head -1)
+
+# as a homework you coud add "{{OP_FINALLY}} tar czvf env-nginx-simple.tgz nginx-*env"
+# archive as last execution command that is run on local host and remove env files
+# all content after {{OP_FINALLY}} is passed to shell execution so you can do both tar and rm
+#    
+exit
+

@@ -1,0 +1,4 @@
+termtosvg ../s_09_4_tks.svg
+kubectl tks -n test-run start env-nginx-simple -l app=nginx -T -d 
+ 
+exit

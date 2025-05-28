@@ -1,0 +1,38 @@
+reset
+termtosvg ../08_tks.svg
+reset
+banner " " " " "tks :" "sequence" "json" | lolcat
+
+# first copy sequences.json to expected place
+# if you do not want to have default or you want to use other sequence.json
+# file then you can use -f switch to specify different sequence.json
+mkdir -p ~/.tks
+cp sequences.json ~/.tks
+
+# here is a list of scripts that are being loaded from sequence.json file
+tks list scripts
+
+# note: kubectl-tks can be copied/linked to tks so 
+# you can call kubectl tks as a plugin or just tks as a standalone app
+#
+
+# we can inspect sequences.json with jq, there are 3 sections
+cat ~/.tks/sequences.json | jq ".|keys" 
+
+# here we can see env script within scripts
+cat ~/.tks/sequences.json| jq .scripts.env
+
+# here is env-nginx-simple script
+cat ~/.tks/sequences.json| jq ".scripts.\"env-nginx-simple\""
+
+# tks info can show you details of a script, you don not have to jq
+tks info env-nginx-simple
+
+# we can ask for rendering/expanding of a script
+tks info env-nginx-simple -x
+
+# with -x we se how shortcuts and scripts resolve
+# kctl variables are available only runtime
+#   
+exit
+

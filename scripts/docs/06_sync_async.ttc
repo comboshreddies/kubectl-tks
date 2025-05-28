@@ -1,0 +1,29 @@
+reset
+termtosvg ../06_tks.svg
+reset
+banner " " " " "tks : -s" "sync" "async" | lolcat
+
+# there are two ways of executing scripts, default is async
+# in async each script per pod will run separately at their own pace
+# in async mode some pod-scripts might have completed while others are still progressing
+# in sync mode each step is executed on all pods, prompt is waited then next step is executed 
+# 
+# in sync mode all pod should execute first command, then second can be executed 
+tks -n test-run start -l app=nginx "echo ABCD {{pod}}; echo XYZW {{pod}}" -T -d -s
+# in async mode script will run on each pod, step by step, independently from other pods
+# so dry run in default mode will show steps oriented by pod (not by script step)
+tks -n test-run start -l app=nginx "echo ABCD {{pod}}; echo XYZW {{pod}}" -T -d
+# live run in sync 
+tks -n test-run start -l app=nginx 'X=$(($RANDOM % 20));sleep $X;echo ABCD;sleep $X;echo XYZW {{pod}}' -T -s
+# live run in async 
+tks -n test-run start -l app=nginx 'X=$(($RANDOM % 20));sleep $X;echo ABCD;sleep $X;echo XYZW {{pod}}' -T
+# even if dry run in async mode will print pod by pod, all pods will run in same time
+# and might end in different times
+#
+# for testing sync vs async mode you can use local-test2 script from sequences.json
+#
+# async mode is practical if you have script execution that might fail
+# for example I have run a script on 100 pods, 5 of them failed (had high load) but I have got
+# results from 95% of platform, and then I attach to tmux and check failed windows
+#    
+exit

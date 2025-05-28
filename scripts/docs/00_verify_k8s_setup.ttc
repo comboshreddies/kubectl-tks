@@ -1,0 +1,18 @@
+reset
+termtosvg ../00_tks.svg
+reset
+banner " " " " "tks :" "verify" "k8s setup" | lolcat 
+
+# create namespace
+kubectl create ns test-run
+# apply sample deployment from repo
+kubectl apply -f ./k8s_yamls/sample_deploy1.yaml
+kubectl apply -f ./k8s_yamls/sample_deploy3.yaml
+# wait a while     
+            
+# verifying that we have pods to work on
+kubectl -n test-run get pod --show-labels
+kubectl -n test-run get pod -l app=nginx
+# ok we have deployment pods to work on
+#    
+exit

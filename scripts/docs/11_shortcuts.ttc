@@ -1,0 +1,28 @@
+reset
+termtosvg ../11_tks.svg
+reset
+banner " " " " "tks : " "shortcuts"  | lolcat 
+
+# list of shortcuts
+tks list shortcuts
+
+# shortcuts are {{ and }} enclosed shortcut items within sequence.json .sortcuts section
+# left part is shortcut name, right part is expanded version
+# one shortcut can contain reference for other shortcut, 
+#
+# if you want to shoot your self you can specify them recursively, (like A shortcut references
+# B shortcut, B shortcut references A shortcut, but there is a limited set of shortcuts 
+# resolution steps, so they won't run forever
+#
+# as example if you use {{ECB}} in your script it will be replaced with "{{EC}} /bin/bash -c" in
+# first resolution/expansion step, then "{{EC}} /bin/bash -c" will be replaced with 
+# "_ exec {{pod}} -c {{p2c}} -- /bin/bash -c", and then _ will be runtime replaced with
+# some kubectl command (ECB is named because it Execute Container Bash)
+# so for you can try this one-liner that is compressed yet expressive:
+kubectl tks -n test-run start -l app=nginx "{{ECB}} date" -T -d
+
+# shortcuts are powerful way of expressing most repetative tasks, and making one-liners short
+# use your imagination for shortcut scripting 
+#    
+exit
+

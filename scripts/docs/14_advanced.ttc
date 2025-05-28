@@ -1,0 +1,53 @@
+reset
+termtosvg ../14_tks.svg
+reset
+banner " " " " tks "advanced" " " | lolcat
+
+# example of a more complex script tcpdump-all
+tks info tcpdump-all
+
+# tcpdump-all script will run on debian like pods
+# * do apt update and apt install of a tcpdump
+# * do time and capture packets limited tcpdump on each pod
+# * archive pcap capture files
+# * copy files to tks running host
+# * terminate tmux session
+#
+# running of tcpdump-all script, then waiting for 12 sec for completion
+kubectl tks -n test-run start tcpdump-all -l app=nginx
+
+#C sleep 10
+# check what files are being copied to localhost
+ls -l *.pcap.gz
+# real beauty of running this example is when you run this one on few hundred of pods 
+# :D
+
+
+# another more complex script
+tks info remote-exec
+# we instruct tks not to wait for prompt because on exec we will
+# get prompt from pod/container, not a local one tks will usually wait for
+# then we instruct tks to read new prompt, so tks loads pod/container prompt
+# as expected result on next command, then we execute few sleeps on pod/container
+# then we exit and we request again that tks do not expect saved prompt, but to skip
+# and load new one, the one from local host
+#
+# running of remote-exec
+kubectl tks -n test-run start remote-exec -l app-nginx
+# you can tmux attach to check
+#
+#
+# now being able to adjust different prompts I have used same tks not just for kubectl
+# for for custom scripts that can jump to node, find pod of exact container and 
+# nsenter to container I was interested to inspect, strace, gdb or whatever
+#
+# if you do not want to have shortcuts and scripts in sequence.json or some other sequence
+# file you can always create custom script and run 
+# kubectl tks -n test-run start "./custom.sh {{pod}} {{nsp}} {{ctx}} {{cnf}}"
+# use tks just as an iterator or generator and do whatever you can imagine
+#
+# the end   
+
+
+banner " " " " tks "the end" " " | lolcat
+

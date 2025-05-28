@@ -1,0 +1,32 @@
+reset
+termtosvg ../04_tks.svg
+reset
+banner " " " " "tks :" "multiple" "commands" | lolcat
+
+# within a one-liner you might want to run more than one command, so for one-liners
+# with ; character you can use to separate multiple commands
+# ; separator will not work in prepared scripts, ie this works only in one-liners
+#
+# here as a first step we will execute env on a pod, then as a second step we will echo podname
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ; echo {{pod}}" -T  
+
+# attach to tmux so we can see what has been executed
+tmux attach -t OneLiner--test-run
+#C tmux send-keys -t 0 "# next screen - ctrl+b + n"
+
+#C ssh gdt "tmux next-window -t OneLiner--test-run"
+#C tmux send-keys -t 0 "# next screen - ctrl+b + n"
+
+#C ssh gdt tmux next-window -t OneLiner--test-run
+#C tmux send-keys -t 0 "# next screen - ctrl+b + n"
+
+#C ssh gdt tmux next-window -t OneLiner--test-run
+#C tmux send-keys -t 0 "# next screen - ctrl+b + n"
+
+#C ssh gdt tmux next-window -t OneLiner--test-run 
+#C tmux send-keys -t 0 "# detach from tmux - ctrl+b + d"
+
+#C ssh gdt "tmux detach-client -s OneLiner--test-run"
+# both commands were executed on all pods
+#    
+exit

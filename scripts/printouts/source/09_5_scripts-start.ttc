@@ -1,0 +1,9 @@
+termtosvg ../s_09_5_tks.svg
+kubectl tks -n test-run start env-nginx-simple -l app=nginx -T 
+#C ~/bin/wait_prompt.sh " ~ $"
+
+ls -l nginx-sample1-*
+
+cat $(ls nginx-sample1-* | head -1) 
+ 
+exit

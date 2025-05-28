@@ -1,0 +1,4 @@
+termtosvg ../s_07_4_tks.svg
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ; echo {{pod}}" -T -d 
+ 
+exit

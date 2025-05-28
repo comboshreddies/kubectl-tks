@@ -1,0 +1,13 @@
+reset
+termtosvg ../03_tks.svg
+reset
+banner " " " " "tks : -d" "tmux" "dry run" | lolcat
+
+# if you want to show what will be executed and not to execute for real there is -d flag
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env" -T -d 
+
+# tks will render all known template variables types 
+# first shortuts, then internal _ (as _ can be used in shortcuts), then controls and
+# then run time available kubernetes/kctl - it will contact kubernetes and ask for pods
+#    
+exit

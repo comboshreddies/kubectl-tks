@@ -1,4 +1,4 @@
-termtosvg ../s_05_2_tks.svg
+termtosvg ../s_05_3_tks.svg
 kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ;{{OP_TERMINATE}}" -T 
 
 tmux ls

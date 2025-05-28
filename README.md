@@ -155,54 +155,65 @@ Below you will see how to auto terminate session within script/one-liner.
 You might have something valuable within tmux and we do not want to
 delete previous session as default behaviour.
 
+## list of available kubernets related template fields
+
+You can always check what kuberntes template variable fields are available with
+```console
+kubectl tks list kctl
+```
+![s_07_1_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_07_1_tks.svg?raw=true)
 
 
 ## one-liner with more kubernetes related templated fields
 
-Now you can see we used k8s_pod as template field for each pod that was there in the test-run namespace.
+Tks used k8s_pod as template variable field for each pod that was there in the test-run namespace.
 We can also use k8s_namespace template field to specify namespace (so you don't have to repeat test-run)
 There are also k8s_config and k8s_context template fields that would be filled if specified within tks command line parameters - if they are not specified they will be empty strings.
 
+here is example of extened k8s variable names
 ```console
 kubectl tks -n test-run start -l app=nginx  "kubectl -n {{k8s_namespace}} exec -t {{k8s_pod}} -c nginx -- env" -T
 ```
-```
-# Unable to read conf file /Users/none/.tks/sequences.json, assuming oneLiner
-# unable to open sequence json file /Users/none/.tks/sequences.json
-# there is already session with this name (OneLiner--test-run), terminating old one
-#### Creating new session OneLiner--test-run
-#### Creating windows per pod
-#### Collecting prompts for each window
-#### Starting execution: sync : false, dry : false
-#EXECUTE #0 nginx-sample1-6475dd48b7-br6jc: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-br6jc -c nginx -- env
-#EXECUTE #0 nginx-sample1-6475dd48b7-bgtsx: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-bgtsx -c nginx -- env
-#EXECUTE #0 nginx-sample1-6475dd48b7-n6mtg: kubectl -n test-run exec -t nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
-#COMPLETED
-```
-It's simpler to use _ instead of kubectl --context {{k8s_context}} -n {{k8s_namespace}} exec -t {{k8s_pod}}
-but you always be more explicit. 
+![s_07_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_07_2_tks.svg?raw=true)
 
-You should be aware that there are shorcuts for kuberenetes related templated fields.
+There are shorcuts for kuberenetes related templated fields (as shown with tks list kctl above).
 Those are: cnf for kubeconfig, ctx for context , nsp for namespace, and pod for pods.
-so same command above could have shortened layout:
+
+here is example of short k8s variable names, they work same
 ```console
 kubectl tks -n test-run start -l app=nginx  "kubectl -n {{nsp}} exec -t {{pod}} -c nginx -- env" -T
 ```
+![s_07_3_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_07_3_tks.svg?raw=true)
+
+It's simpler to use _ instead of kubectl --context {{k8s_context}} -n {{k8s_namespace}} exec -t {{k8s_pod}}
+but you always be more explicit. 
+
+here is an example of _ start line shortcut with shortened {{pod}} kctl variable:
+```console
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ; echo {{pod}}" -T -d
+```
+![s_07_4_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_07_4_tks.svg?raw=true)
+
+here is an example that shows that _ will act differently if more kubectl arguments (in this case context) are passed:
+```console
+kubectl tks --context minikube -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ; echo {{pod}}" -T -d
+```
+![s_07_5_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_07_5_tks.svg?raw=true)
+
 
 ## one-liner with dry run mode
 
-You can always run command in dry-run mode with -d flag, only output will be printed, but templated fields are resolved. Table shows podname, pod number, script line number, then command that would have been executed
+If you want to show what will be executed and not to execute for real there is -d flag
 
 ```console
 kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- env" -d
 ```
-```
-# Unable to read conf file /Users/none/.tks/sequences.json, assuming oneLiner
-# unable to open sequence json file /Users/none/.tks/sequences.json
-nginx-sample1-6475dd48b7-bgtsx 0 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-bgtsx -c nginx -- env
-nginx-sample1-6475dd48b7-br6jc 1 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-br6jc -c nginx -- env
-nginx-sample1-6475dd48b7-n6mtg 2 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
-```
+![s_03_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_03_tks.svg?raw=true)
+
+Tks in dryRun mode will render all known template variables types
+first shortuts, then internal _ (as _ can be used in shortcuts), then controls and
+then run time available kubernetes/kctl - it will contact kubernetes and ask for pods
+
 
 
 ## one-liner with more than one executions
@@ -211,24 +222,60 @@ You can specify more than one command in One-Liner execution. Commands are separ
 ```console
 kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- env;echo {{k8s_pod}}" -T
 ```
-You can do tmux attach to inspect execution, by switching between tmux terminal windows.
+![s_04_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_04_tks.svg?raw=true)
+
+You can attach to tmux to inspect execution, and switch between tmux terminal windows.
+
+## tks tmux control operations
+
+To be able to better manage tmux session there are specific control operations that are built in in tks.
+You can check them with
+
+```console
+kubectl tks list control
+```
+![s_05_1_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_05_1_tks.svg?raw=true)
+
+We will cover just few most important
+
+
+## one-liner with comment control instruction
+
+Comment control instruction is used by specifying {{OP_COMMENT}}
+All content left of OP_COMMENT tag will be rendered with template variables (shortcuts, kctl or podMap),
+and will be displayed back to tmux screen.
+
+```console
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ;{{OP_COMMENT}} doing env on pod {{pod}}" -T
+```
+![s_05_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_05_2_tks.svg?raw=true)
+
+
+## one-liner with terminating tmux session control instruction 
+
+If you do not want to manually terminate tmux session every time you run script or oneliner
+you can add OP_TERMINATE. Tks will terminate tks tmux session (closing all windows) once all pods
+have all script steps (commands) executed. OP_TERMINATE is final command, no other commands will be
+processes after.
+
+```console
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ;{{OP_TERMINATE}}" -T
+```
+![s_05_3_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_05_3_tks.svg?raw=true)
+
+Now at the end of execution tks will terminate session, so next time you might not need -T.
 
 
 ## one-liner with attaching to tmux session
 
-If you do not want to manually attach to execution every time you can add OP_ command for attaching 
-
+You can use {{OP_ATTACH}} to attach to tmux session (windows) at the end of script.
 ```console
-kubectl tks -n test-run start -l app=nginx  "_ exec {{k8s_pod}} -c nginx -- env;{{OP_ATTACH}}" -T
+kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ;{{OP_ATTACH}}" -T
 ```
+![s_05_4_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_05_4_tks.svg?raw=true)
 
-Now at the end of execution tks will attach the tmux session it created. 
-There are more OP_ commands available, you can find more in question section Q: What other OP_ commands are available ?
-
-Once you learn what operations are available and what they stand for, you can use also shortened operations.
-In this case you could use {{_A}} as a short version of a {{OP_ATTACH}}.
-
-You can use {{OP_TERMINATE}} to terminate tmux windows at the end of script.
+OP_ATTACH is also final command, no other commands will be executed after this instruction is reached.
+With attach you can get overview of what has been executed or continue to execute commands in terminals.
 
 
 ## using sequence file for storing complex scripts

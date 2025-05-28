@@ -1,3 +1,3 @@
 package internal
 
-const TksVersion = "v0.8.4"
+const TksVersion = "v0.8.5"

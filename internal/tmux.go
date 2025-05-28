@@ -189,7 +189,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 			case OpInfo:
 				fmt.Printf("#INFO: %s\n", line)
 			case OpComment:
-				fmt.Printf("#INFO: %s\n", line)
+				fmt.Printf("#Comment: %s\n", line)
 				for podIdx := 0; podIdx < len(ti.PodList); podIdx++ {
 					fmt.Printf("#COMMENT: %s\n", RenderLineForExec(ti, podIdx, scrIdx))
 				}
@@ -236,7 +236,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 				}
 			}
 		}
-	} else {
+	} else { // syncExec == false
 		var wg sync.WaitGroup
 		var podStep []int
 		finalOp := make(map[int]OpDecoded)
@@ -418,7 +418,8 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int) {
 	original := ti.ScriptLines[scriptLineIndex]
 	var line string
 	op := OpExecute
-	if len(original) > 5 && original[:2] == "{{" {
+
+	if (len(original) > 3 && original[:3] == "{{_") || (len(original) > 5 && original[:2] == "{{") {
 		op, line = OpLineTagToString(original)
 		original = line
 	}
@@ -434,11 +435,14 @@ func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string 
 	podName := ti.PodList[podListIndex].PodName
 	original := ti.ScriptLines[scriptLineIndex]
 	var line string
-	var op OpDecoded
-	if len(original) > 5 && original[:5] == "{{OP_" {
+	if (len(original) > 3 && original[:3] == "{{_") || (len(original) > 5 && original[:5] == "{{OP_") {
 		// should not match, but if we do, put # shell comment
-		op, line = OpLineTagToString(original)
-		original = fmt.Sprintf("#%s: %s", OpInstruction[op], line)
+		op, line := OpLineTagToString(original)
+		if op == OpComment { // opComment is only non OpExec that is Rendered for exec
+			original = fmt.Sprintf("#%s", line)
+		} else {
+			original = line
+		}
 	}
 	line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
 	line = ExpandUnderscore(line, ti.K8sConfig, ti.K8sContext, ti.K8sNamespace)

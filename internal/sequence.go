@@ -105,7 +105,7 @@ func OpLineTagToOpString(line string) (op OpDecoded, opLine string) {
 			for i := 0; i < len(SupportedOps); i++ {
 				if OpShort[SupportedOps[i]] == check_operation {
 					retOperation = SupportedOps[i]
-					retLine = splitLine[1]
+					retLine = strings.Join(splitLine[1:], "}}")
 					break
 				}
 			}
@@ -119,7 +119,7 @@ func OpLineTagToOpString(line string) (op OpDecoded, opLine string) {
 			for i := 0; i < len(SupportedOps); i++ {
 				if OpInstruction[SupportedOps[i]] == check_operation {
 					retOperation = SupportedOps[i]
-					retLine = splitLine[1]
+					retLine = strings.Join(splitLine[1:], "}}")
 					break
 				}
 			}

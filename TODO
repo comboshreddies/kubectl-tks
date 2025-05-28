@@ -17,3 +17,5 @@ aware of session it runs to
 * In k8s.go consider recording containers name list []string, currently not needed, maybe for
 some additional functionality
 
+* podConverter -> podNameMapper
+

@@ -25,7 +25,7 @@ type TmuxInData struct {
 	SessionName  string
 }
 
-func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
+func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 	//	fmt.Println(ti.SeqName)
 	//	fmt.Println(ti.ScriptLines)
 	//	fmt.Println(ti.K8sConfig)
@@ -56,7 +56,9 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 	}
 
 	if tmux.HasSession(tmuxSessionName) {
-		fmt.Printf("# there is already session with this name (%s), ", tmuxSessionName)
+		if !quiet {
+			fmt.Printf("# there is already session with this name (%s), ", tmuxSessionName)
+		}
 		if delTxSess == true {
 			cmd := exec.Command(os.Getenv("SHELL"), "-c", fmt.Sprintf("tmux kill-session -t %s\n", tmuxSessionName))
 			err := cmd.Run()
@@ -65,14 +67,18 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 				fmt.Printf("unable to terminate session %s, exiting", tmuxSessionName)
 				return
 			}
-			fmt.Printf("terminating old one\n")
+			if !quiet {
+				fmt.Printf("terminating previous session\n")
+			}
 		} else {
 			fmt.Printf("exiting\n")
 			return
 		}
 	}
 
-	fmt.Printf("#### Creating new session %s\n", tmuxSessionName)
+	if !quiet {
+		fmt.Printf("#### Creating new session %s\n", tmuxSessionName)
+	}
 	tmuxSession, err := tmux.NewSession(&gotmux.SessionOptions{
 		Name: tmuxSessionName,
 	})
@@ -84,7 +90,9 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 	windows, err := tmuxSession.ListWindows()
 	windows[0].Rename("base")
 
-	fmt.Printf("#### Creating windows per pod\n")
+	if !quiet {
+		fmt.Printf("#### Creating windows per pod\n")
+	}
 	// open window per pod
 	for i := 0; i < len(ti.PodList); i++ {
 		newWinOpts := gotmux.NewWindowOptions{}
@@ -103,7 +111,9 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 
 	windows, err = tmuxSession.ListWindows()
 
-	fmt.Printf("#### Collecting prompts for each window\n")
+	if !quiet {
+		fmt.Printf("#### Collecting prompts for each window\n")
+	}
 	prompts := make(map[int]string)
 	for i := 0; i < len(windows); i++ {
 		prompts[i], err = tmux_get_pane_prompt(windows[i])
@@ -123,7 +133,9 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess bool) {
 		podIdx2WinIdx[i] = winName2Idx[ti.PodList[i].PodName]
 	}
 
-	fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
+	if !quiet {
+		fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
+	}
 	if syncExec == true {
 		line := ""
 		var operation OpDecoded

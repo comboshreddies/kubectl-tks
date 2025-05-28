@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"errors"
+	"os"
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,6 +18,14 @@ type PodsInfo struct {
 }
 
 func Kubernetes_pod_list(K8sConfig, K8sContext, K8sNamespace, K8sSelector string) (pi []PodsInfo, err error) {
+
+	envconf := os.Getenv("KUBECONFIG")
+	if envconf != "" && K8sConfig == "" {
+		_, err := os.Stat(envconf)
+		if err == nil {
+			K8sConfig = envconf
+		}
+	}
 	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 	if K8sConfig != "" {
 		loadingRules.ExplicitPath = K8sConfig

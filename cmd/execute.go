@@ -13,6 +13,7 @@ type CliOptions struct {
 	K8sSelector    string
 	KTxDryRun      bool
 	KTxSync        bool
+	KTxQuiet       bool
 	KTxTermSess    bool
 	KTxPodList     string
 	KTxPrompt      string
@@ -21,7 +22,7 @@ type CliOptions struct {
 }
 
 var o = CliOptions{
-	ScriptFile:     "~/.tks/sequences.json",
+	ScriptFile:     "",
 	ExpandSeq:      false,
 	K8sConfig:      "~/.kube/config",
 	K8sContext:     "",
@@ -29,6 +30,8 @@ var o = CliOptions{
 	K8sSelector:    "",
 	KTxDryRun:      false,
 	KTxSync:        false,
+	KTxQuiet:       false,
+	KTxTermSess:    false,
 	KTxPodList:     "",
 	KTxPrompt:      "",
 	KTxPromptSleep: 0,
@@ -40,7 +43,6 @@ var o = CliOptions{
 var rootCmd = &cobra.Command{Use: "kubect-tks"}
 
 func init() {
-	// rootCmd.Flags().StringVarP(&o.ScriptFile, "scriptFile", "f", "", "scriptFile (default is $HOME/.tmux-k8s-scripts.yaml)")
 }
 
 func Execute() error {

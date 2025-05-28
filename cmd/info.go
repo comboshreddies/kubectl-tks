@@ -25,6 +25,15 @@ func init() {
 }
 
 func processInfo(cmd *cobra.Command, args []string) {
+
+	envpath := os.Getenv("TKSSEQUENCE")
+	if envpath != "" && o.ScriptFile == "" {
+		_, err := os.Stat(envpath)
+		if err == nil {
+			o.ScriptFile = envpath
+		}
+	}
+
 	if o.ScriptFile == "" {
 		if home := homedir.HomeDir(); home != "" {
 			o.ScriptFile = filepath.Join(home, ".tks/sequences.json")
@@ -49,7 +58,7 @@ func processInfo(cmd *cobra.Command, args []string) {
 		return
 	} else {
 
-		seq, err = internal.OpenAndReadSequencefile(o.ScriptFile)
+		seq, err = internal.OpenAndReadSequencefile(o.ScriptFile, false)
 		if err != nil {
 			fmt.Println(err)
 			return

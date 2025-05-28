@@ -29,7 +29,7 @@ type SequenceConfig struct {
 	Scripts    []scriptItem
 }
 
-func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
+func OpenAndReadSequencefile(fileName string, quiet bool) (conf SequenceConfig, err error) {
 	var seq SequenceConfig
 
 	jsonFile, err := os.Open(fileName)
@@ -59,7 +59,9 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 				}
 				seq.PodCs = append(seq.PodCs, x)
 			}
-			fmt.Println("#PodConverter loaded from sequence.file")
+			if !quiet {
+				fmt.Printf("#PodConverter loaded from %s\n", fileName)
+			}
 		}
 		if key == "shortcuts" {
 			seq.Shorts = make(map[string]string)
@@ -68,7 +70,9 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 				seq.Shorts[key1] = val1.(string)
 			}
 			slices.Sort(seq.ShortsKeys)
-			fmt.Println("#Shortcuts loaded from sequence.file")
+			if !quiet {
+				fmt.Printf("#Shortcuts loaded from %s\n", fileName)
+			}
 		}
 		if key == "scripts" {
 			var t scriptItem
@@ -81,7 +85,9 @@ func OpenAndReadSequencefile(fileName string) (conf SequenceConfig, err error) {
 				t.Items = cmdList
 				seq.Scripts = append(seq.Scripts, t)
 			}
-			fmt.Println("#Sripts loaded from sequence.file")
+			if !quiet {
+				fmt.Printf("#Sripts loaded from %s\n", fileName)
+			}
 		}
 	}
 	return seq, nil

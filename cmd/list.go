@@ -48,6 +48,15 @@ func processList(cmd *cobra.Command, args []string) {
 
 	seq := internal.SequenceConfig{}
 
+	envpath := os.Getenv("TKSSEQUENCE")
+	fmt.Println(envpath)
+	if envpath != "" && o.ScriptFile == "" {
+		_, err := os.Stat(envpath)
+		if err == nil {
+			o.ScriptFile = envpath
+		}
+	}
+
 	if o.ScriptFile == "" {
 		if home := homedir.HomeDir(); home != "" {
 			o.ScriptFile = filepath.Join(home, ".tks/sequences.json")
@@ -69,7 +78,7 @@ func processList(cmd *cobra.Command, args []string) {
 		fmt.Printf("# No script file %s found, try using -f <path_to_sequence.file>\n", "sequences.json")
 		return
 	} else {
-		seq, err = internal.OpenAndReadSequencefile(o.ScriptFile)
+		seq, err = internal.OpenAndReadSequencefile(o.ScriptFile, false)
 		if err != nil {
 			fmt.Printf("Can't read conf file\n")
 			fmt.Println(err)

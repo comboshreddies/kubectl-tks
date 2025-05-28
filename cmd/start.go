@@ -19,6 +19,7 @@ func init() {
 	cmdStart.Flags().StringVarP(&o.K8sSelector, "selector", "l", "", "kubernetes label query selector")
 	cmdStart.Flags().BoolVarP(&o.KTxDryRun, "dry", "d", false, "start a dry run, no script execution")
 	cmdStart.Flags().BoolVarP(&o.KTxSync, "sync", "s", false, "run in sync step mode")
+	cmdStart.Flags().BoolVarP(&o.KTxQuiet, "quiet", "q", false, "run in quiet mode")
 	cmdStart.Flags().BoolVarP(&o.KTxTermSess, "term", "T", false, "terminate tmux session if exists, before starting")
 	cmdStart.Flags().StringVarP(&o.KTxSessionName, "sessionName", "S", "", "tmux session name")
 	cmdStart.Flags().StringVarP(&o.KTxPodList, "pods", "p", "", "set list of pods, comma separated")
@@ -43,6 +44,14 @@ func processStart(cmd *cobra.Command, args []string) {
 	noConfFile := false
 	seq := internal.SequenceConfig{}
 
+	envpath := os.Getenv("TKSSEQUENCE")
+	if envpath != "" && o.ScriptFile == "" {
+		_, err := os.Stat(envpath)
+		if err == nil {
+			o.ScriptFile = envpath
+		}
+	}
+
 	if o.ScriptFile == "" {
 		if home := homedir.HomeDir(); home != "" {
 			o.ScriptFile = filepath.Join(home, ".tks/sequences.json")
@@ -65,7 +74,7 @@ func processStart(cmd *cobra.Command, args []string) {
 		noConfFile = true
 		seq.Shorts = nil
 	} else {
-		seq, err = internal.OpenAndReadSequencefile(o.ScriptFile)
+		seq, err = internal.OpenAndReadSequencefile(o.ScriptFile, o.KTxQuiet)
 		if err != nil {
 			fmt.Println(err)
 			fmt.Printf("# Unable to read conf file %s, assuming oneLiner\n", o.ScriptFile)
@@ -80,8 +89,10 @@ func processStart(cmd *cobra.Command, args []string) {
 	if noConfFile == false {
 		seqOffset, err = internal.IsThereAScript(args[0], seq.Scripts)
 		if err != nil {
-			fmt.Println(err)
-			fmt.Printf("# assuming oneLiner\n")
+			if !o.KTxQuiet {
+				fmt.Println(err)
+				fmt.Printf("# assuming oneLiner '%s'\n", args[0])
+			}
 			noScript = true
 		}
 	}
@@ -134,5 +145,5 @@ func processStart(cmd *cobra.Command, args []string) {
 	tmuxIn.PromptSleep = o.KTxPromptSleep
 	tmuxIn.SessionName = o.KTxSessionName
 
-	internal.StartTmux(tmuxIn, o.KTxDryRun, o.KTxSync, o.KTxTermSess)
+	internal.StartTmux(tmuxIn, o.KTxDryRun, o.KTxSync, o.KTxTermSess, o.KTxQuiet)
 }

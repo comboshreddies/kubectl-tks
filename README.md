@@ -277,6 +277,129 @@ kubectl tks -n test-run start -l app=nginx  "_ exec {{pod}} -c nginx -- env ;{{O
 OP_ATTACH is also final command, no other commands will be executed after this instruction is reached.
 With attach you can get overview of what has been executed or continue to execute commands in terminals.
 
+## tks supports sync and async mode
+
+By default, with no additional switches tks will work in async mode.
+If you add -s switch it will run in sync mode.
+
+In async each script per pod will run separately at their own pace
+In async mode some pod-scripts might have completed while others are still progressing
+In sync mode each step is executed on all pods, prompt line (that confirms command returned) 
+is waited for all pods, then next step is executed.
+
+In sync mode all pod should execute first command, then second can be executed.
+Before running your script you can check with dry mode how it will behave with sync or async mode.
+```console
+tks -n test-run start -l app=nginx "echo ABCD {{pod}}; echo XYZW {{pod}}" -T -d -s
+```
+![s_06_1_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_06_1_tks.svg?raw=true)
+Dry run sync mode tries to show that first step will be executed on all pods,
+then second (so there is grouping with /|\ characters)
+
+In async mode each pod runs script instructions indenpendently.
+Same as previous example but without -s (so in async mode) will look like
+```console
+tks -n test-run start -l app=nginx "echo ABCD {{pod}}; echo XYZW {{pod}}" -T -d
+```
+![s_06_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_06_2_tks.svg?raw=true)
+Dry run in async mode shows grouping by pod, but each pod execution will run in parallel.
+
+here is example of running in sync mode (so no dry run)
+```console
+tks -n test-run start -l app=nginx 'X=$(($RANDOM % 20));sleep $X;echo ABCD;sleep $X;echo XYZW {{pod}}' -q -T -s
+```
+![s_06_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_06_2_tks.svg?raw=true)
+and same but in async (default) mode
+```console
+tks -n test-run start -l app=nginx 'X=$(($RANDOM % 20));sleep $X;echo ABCD;sleep $X;echo XYZW {{pod}}' -q -T 
+```
+![s_06_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_06_2_tks.svg?raw=true)
+Output of async mode shows nature of async, some pods complete last line befor others, there is no strict ordering.
+If some pod execution is slow or blocked that won't stop other pod executions.
+
+Keep in mind that if for any reason (for example pod termination/deletion) one pod does not return prompt,
+no other steps will be executed and tks will keep hanging on - so you shuold ctrl+c and then tmux attach,
+to check what went wrong.
+
+## tks list scripts and get more info
+
+### tks list
+
+kubectl-tks can be used independently as tks binary (just link or copy). tks is a kubectl plugin
+but plugins are standalone applications to, so instead of kubectl tks I've used tks in examples below
+
+here is an output of tks list
+```console
+tks list
+```
+![s_10_1_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_10_1_tks.svg?raw=true)
+
+### tks list kctl 
+
+We've already seen this one, it will show tks available kubectl params used for template fields.
+Those kctl params are internal to tks.
+
+let's repeat
+```console
+tks list kctl 
+```
+![s_10_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_10_2_tks.svg?raw=true)
+
+
+### tks list control
+
+To see what integrated control operations are available in tks you can run.
+
+```console
+tks list control
+```
+![s_10_3_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_10_3_tks.svg?raw=true)
+
+OP_TERMINATE, OP_ATTACH and OP_FINALLY are terminal commands, no other instructions will be processed after this
+command is reached.
+OP_INFO is used as short description for scripts, if OP_INFO is specified as first step in script sequence it will
+be used for help line. See below for tks list scripts. Scripts without OP_INFO on first line will not show help.
+
+### tks scripts
+
+Config file sequences.json contains section for scripts. Those scripts can be listed with following:
+```console
+tks list scripts
+```
+![s_10_4_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_10_4_tks.svg?raw=true)
+
+This command shows list of available scripts than one can run (start command) with tks.
+
+You can copy or modify this sequences.json file, but keep in mind that if json format is broken tks will not be able
+to load content from it.
+
+More info about each script can be found out by tks info <script name>, will be explained below.
+
+
+### tks shortcuts
+
+Shortcuts are also defined in sequences.json . Shortcuts are here to help you write most frequently repeated parts
+of script instructions.
+
+```console
+tks list shortcuts
+```
+
+![s_10_5_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_10_5_tks.svg?raw=true)
+
+
+
+### tks podMap
+
+PodMap section of sequences.json file contains set of regexp rules executed on pod-name ( ie {{pod}}), and if
+regexp matches it returns value on left.
+
+Let's see details:
+```console
+tks list podMap
+```
+![s_10_6_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_10_6_tks.svg?raw=true)
+
 
 ## using sequence file for storing complex scripts
 
@@ -289,6 +412,8 @@ sequence.json file contains 3 sections:
 - scripts
 - shortcuts
 - podMap
+
+We've seen those sections with tks list examples, above.
 
 
 ### sequence.json - scripts section 
@@ -386,7 +511,7 @@ Check also the answer below for question Q: What other OP_ commands are availabl
 
 If you get tired of writing a full kubectl line every time you can use shortcuts.
 
-If there are parts of scripts that you use that are frequently repeated instead of
+If there are parts of scripts that you use frequently, instead of writing same every time
 ```console
 "kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c nginx  -- env > {{k8s_pod}}.env"
 ```

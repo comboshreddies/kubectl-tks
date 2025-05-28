@@ -70,7 +70,9 @@ func processStart(cmd *cobra.Command, args []string) {
 	}
 	_, err = os.Stat(o.ScriptFile)
 	if err != nil { // check for krew store path
-		fmt.Printf("# No script file %s found, try using -f <path_to_sequence.file>\n", "sequences.json")
+		if !o.KTxQuiet {
+			fmt.Printf("# No script file %s found, try using -f <path_to_sequence.file>\n", "sequences.json")
+		}
 		noConfFile = true
 		seq.Shorts = nil
 	} else {

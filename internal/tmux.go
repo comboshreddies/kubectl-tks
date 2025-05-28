@@ -37,7 +37,9 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 	//	fmt.Println("------====----")
 
 	if dry == true {
-		fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
+		if !quiet {
+			fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
+		}
 		dryRunPrintOut(ti, syncExec)
 		return
 	}
@@ -236,11 +238,11 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 		}
 	} else {
 		var wg sync.WaitGroup
-		podStep := make(map[int]int)
+		var podStep []int
 		finalOp := make(map[int]OpDecoded)
 		finalLine := make(map[int]string)
 		for podIdx := 0; podIdx < len(ti.PodList); podIdx++ {
-			podStep[podIdx] = 0
+			podStep = append(podStep, 0)
 			finalOp[podIdx] = OpUnknown
 			finalLine[podIdx] = ""
 		}

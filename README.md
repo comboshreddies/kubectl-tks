@@ -375,6 +375,10 @@ to load content from it.
 
 More info about each script can be found out by tks info <script name>, will be explained below.
 
+If you want to use some other sequence.json config file you can always use -f other_sequence_file.json 
+For example one can have separate sequence.json for apt-based containers, and separate for yum-based containers,
+and separate for apk, but you can keep them in one file using podMap - more about that below.
+
 
 ### tks shortcuts
 
@@ -388,7 +392,6 @@ tks list shortcuts
 ![s_10_5_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_10_5_tks.svg?raw=true)
 
 
-
 ### tks podMap
 
 PodMap section of sequences.json file contains set of regexp rules executed on pod-name ( ie {{pod}}), and if
@@ -399,6 +402,8 @@ Let's see details:
 tks list podMap
 ```
 ![s_10_6_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_10_6_tks.svg?raw=true)
+
+We will learn more about scripts, shortcuts, podMaps below in that goes in details on sequence.json content .
 
 
 ## using sequence file for storing complex scripts
@@ -428,29 +433,39 @@ For example:
         "cat {{k8s_pod}}.env"
     ],
 ```
-Scripts are working same way as OneLiners but you can call them by name (env-nginx-simple) instead of typing long OneLiners. 
+Scripts are working same way as OneLiners but you can call them by name (env-nginx-simple) instead of typing long OneLiners. Each line is new command that will be executed in one step of a script. OP_INFO is help tag - it is shown in tks list scripts.
 
-so you can run
+Important difference between one-liners and scripts:
+You can use ; sign separator but it will not check control ({{OP_}}) instructions there - ie usage of ; in one-liners is to split one line to multiple commands, in scripts ; is regular shell command separator.
 
+
+### sequence.json - more info 
+Instead of looking with editor or jq in sequences.json you can
+```console
+tks info env-nginx-simple
+```
+![s_08_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_08_2_tks.svg?raw=true)
+
+Also you can try to expand shortcuts in script (but this env-nginx-simple does not have shortcuts)
+```console
+tks info env-nginx-simple -x
+```
+![s_08_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_08_2_tks.svg?raw=true)
+Info can not expand kctl (k8s_) parameters as those are available run time (same goes for podMaps), 
+but it will expand shorcuts.
+
+To check how this cript will look at execution time we can try dry run:
+```console
+kubectl tks -n test-run start env-nginx-simple -l app=nginx -T -d
+```
+![s_09_4_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_09_4_tks.svg?raw=true)
+
+and then we can run the script
 ```console
 kubectl tks -n test-run start env-nginx-simple -l app=nginx -T
 ```
-```
-#### Creating new session env-nginx-simple--test-run
-#### Creating windows per pod
-#### Collecting prompts for each window
-#### Starting execution: sync : false, dry : false
-#INFO #0, nginx-sample1-6475dd48b7-n6mtg:  execute env on each pod and put to pod.env file
-#INFO #0, nginx-sample1-6475dd48b7-bgtsx:  execute env on each pod and put to pod.env file
-#INFO #0, nginx-sample1-6475dd48b7-br6jc:  execute env on each pod and put to pod.env file
-#EXECUTE #1 nginx-sample1-6475dd48b7-br6jc: kubectl -n test-run exec nginx-sample1-6475dd48b7-br6jc -c nginx  -- env > nginx-sample1-6475dd48b7-br6jc.env
-#EXECUTE #1 nginx-sample1-6475dd48b7-bgtsx: kubectl -n test-run exec nginx-sample1-6475dd48b7-bgtsx -c nginx  -- env > nginx-sample1-6475dd48b7-bgtsx.env
-#EXECUTE #1 nginx-sample1-6475dd48b7-n6mtg: kubectl -n test-run exec nginx-sample1-6475dd48b7-n6mtg -c nginx  -- env > nginx-sample1-6475dd48b7-n6mtg.env
-#EXECUTE #2 nginx-sample1-6475dd48b7-br6jc: cat nginx-sample1-6475dd48b7-br6jc.env
-#EXECUTE #2 nginx-sample1-6475dd48b7-n6mtg: cat nginx-sample1-6475dd48b7-n6mtg.env
-#EXECUTE #2 nginx-sample1-6475dd48b7-bgtsx: cat nginx-sample1-6475dd48b7-bgtsx.env
-#COMPLETED
-```
+![s_09_5_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_09_5_tks.svg?raw=true)
+
 You can check files in local directory, there should be nginx-sample1- .env files for each pod
 Also you can attach tmux, as it's left running.
 
@@ -469,42 +484,9 @@ In sequence.json scripts there is :
 If you run this one, OP_TERMINATE will instruct tks to terminate the tmux session, you will get only env files.
 Feel free to adjust and modify sripts section to fit your needs.
 
-### sequence.json - list available scripts
-You can check a list of available scripts within sequence.json like this
-```console
-kubectl tks list scripts
-```
-```
-#PodMap loaded from sequence.file
-#Shortcuts loaded from sequence.file
-#Sripts loaded from sequence.file
-  custom  :  custom shell script, just passing variables
-  dry  :  just echo {{k8s_context}} {{k8s_namespace}} {{k8s_pod}} and {{p2c}} values
-  env  :  execute env on each pod and put to pod.env file
-...
-...
-
-```
 you will get list of scripts with their info, list will show scripts that are available in sequence.json file
 If you want to use some other sequence.json config file you can always use -f other_sequence_file.json 
 For example I do have separate sequence.json for apt-based containers, and separate for yum-based containers.
-
-
-For more details on what can be listed (beside scripts), do:
-```console
-kubectl tks list
-```
-```
-Usage:
-  kubect-tks list [scripts|shortcuts|podMap|control|kctl] [flags]
-```
-
-
-Up to now we have seen following OP_ commands:
-OP_INFO line is used as information printed when tks list scripts is called
-OP_TERMINATE terminates tmux session
-OP_ATTACH attached to tmux session
-Check also the answer below for question Q: What other OP_ commands are available ? 
 
 
 ### sequence.json - shortcuts
@@ -524,6 +506,20 @@ and following as a line for execution
 "{{XKNE}} -c nginx -- env > {{k8s_pod}}}.env"
 ```
 
+here is an example of expanding (via dry run) one-liner that uses shortcut from sequences.json
+```console
+kubectl tks -n test-run start -l app=nginx "{{ECB}} date" -T -d
+```
+![s_09_5_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_09_5_tks.svg?raw=true)
+
+Shortcuts are making one-liners (and scripts) more expressive, fast to type, but lets' resolve them.
+ECB is shortcut for {{EC}} /bin/bash -c
+EC is shortcut for _ exec {{pod}} -c {{p2c}} --
+_ is dynamic shortcut (tks implemented) that repeats kubectl options (context, namespace, config)
+p2c is podMap that maps everything like 'nginx.*' to 'nginx', that is how got -c nginx
+so this is resolved to (for one specific pod):
+kubectl -n test-run exec nginx-sample1-59d677c5cb-flpft -c nginx -- /bin/bash -c  date
+
 
 ### sequence - how template fields are replaced and in which order
 
@@ -538,19 +534,10 @@ Before executing of each line:
 
 ### sequence.json - shortcuts - available shortcuts
 
-you can list available shortcuts
-```console
-kubectl tks list shortcuts
-```
-```
-EC : _ exec {{pod}} -c {{p2c}} --
-ECV : {{EC}} /bin/bash -c
-KCTL_LOGS_SWITCHES :  --prefix --timestamps --max-log-requests 100
-LC : _ logs -f {{KCTL_LOGS_SWITCHES}} {{pod}} -c {{p2cLog}}
-```
+We've seen list of shortcuts above, tks list shortcuts. To resolve them use one-liners in dry-run mode
 
 
-## sequence.json - podMap intro
+## sequence.json - podMap details
 
 While running tks in some cases you might have to run the same script (sequence of commands) on various pods.
 Some pods might have different pod name (pod that you are interested to jump and execute something in),
@@ -578,18 +565,19 @@ Now you can use {{p2c}} field template to call the same script on both busybox a
 ```
 Or you can use shortcuts and just focus on what you need to be done on pod exec side
 ```console
-"{{KNEC-}} env > {{k8s_pod}}}.env"
+"{{EC}} env > {{k8s_pod}}}.env"
 ```
+EC is resolved/expanded to '_ exec {{pod}} -c {{p2c}} --'
 
 Keep in mind that "env > {{k8s_pod}}.env" is being executed on local machine, as env is executed on
 kubernetes pods side, but redirects are done on local machine.
 If you like to have env copy on pod you should do
 ```console
-"{{KNEC-}} /bin/bash -c 'env > {{k8s_pod}}}.env'"
+"{{EC}} /bin/bash -c 'env > {{k8s_pod}}}.env'"
 ``` 
 ie
 ```console
-"kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c {{p2c}}  -- /bin/sh `env > {{k8s_pod}}.env`"
+"kubectl -n {{k8s_namespace}} exec {{k8s_pod}} -c {{p2c}}  -- /bin/sh 'env > {{k8s_pod}}.env'"
 ```
 
 
@@ -613,16 +601,10 @@ Once you have sequences.json you can use podMaps in your OneLiners
 ```console
 kubectl tks -n test-run start -l app=nginx  "_ exec -t {{k8s_pod}} -c {{p2c}} -- env" -d
 ```
-```
-# No matching script kubectl -n {{k8s_namespace}} exec -t {{k8s_pod}} -c {{p2c}} -- env in conf file
-# assuming oneLiner
-nginx-sample1-6475dd48b7-bgtsx 0 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-bgtsx -c nginx -- env
-nginx-sample1-6475dd48b7-br6jc 1 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-br6jc -c nginx -- env
-nginx-sample1-6475dd48b7-n6mtg 2 0 kubectl -n test-run exec -t nginx-sample1-6475dd48b7-n6mtg -c nginx -- env
-```
 
 # advanced topics
-## executing within kubectl exec on pod
+
+## executing within kubectl exec on pod - remote-exec script 
 Once the tks tool is started, a new tmux session is created. Then for each pod a new tmux window (and pane) is created.
 First thing after creating windows for each pod is fetching the prompt line. Prompt will be used to confirm that
 the previous command has been executed and that next command can be executed. 
@@ -634,20 +616,45 @@ Usually that prompt is a pod name, but it can be anything. In such cases, in ord
 For example:
 
 ```jsonl
-    "remote-exec": [
-        "kubectl --context {{k8s_context}} -n {{k8s_namespace}} exec -it {{k8s_pod}} -c {{p2c}} -- /bin/bash",
-        "{{OP_NO_PROMPT_WAIT}}",
-        "{{OP_REFRESH_PROMPT}}",
-        "sleep 20",
-        "sleep 10",
-        "hostname",
-        "exit",
-        "{{OP_NO_PROMPT_WAIT}}",
-        "{{OP_REFRESH_PROMPT}}",
-        "hostname"
-    ]
+"remote-exec": [
+  "{{OP_INFO}} example of attaching to remote host with different prompt",
+  "{{EICBS}}",
+  "{{OP_NO_PROMPT_WAIT}}",
+  "{{OP_REFRESH_PROMPT}}",
+  "date",
+  "hostname",
+  "exit",
+  "{{OP_NO_PROMPT_WAIT}}",
+  "{{OP_REFRESH_PROMPT}}",
+  "hostname"
+]
 ```
-this example will execute kubectl, but will not wait for prompt, it will load new prompt, then will execute remote (kubectl pod/container) sleep 20 (will wait for prompt), then sleep 10 (will wait for prompt), then it will exit without waiting for prompt, then it will load prompt again (as after exit we are back in local shell),  
+this example will execute kubectl, but will not wait for prompt, it will load new prompt, then will execute remote (kubectl pod/container) date (will wait for prompt), then will execute hostname (will wait for prompt), then it will exit without waiting for prompt, then it will load prompt again (as after exit we are back in local shell), and execute hostname
+on local host (one that we run tks on)
+
+```console
+kubectl tks -n test-run start remote-exec -l app=nginx -q
+```
+![s_14_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_14_2_tks.svg?raw=true)
+
+
+## capturing files on pods then copy then to local
+
+Another nice script in sequences.json is tcpdump-all
+
+here is dry run
+```console
+tks -n test-run start -l app=nginx tcpdump-all -d
+```
+
+and here is execution
+```console
+kubectl tks -n test-run start tcpdump-all -l app=nginx -q
+```
+![s_14_1_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_14_1_tks.svg?raw=true)
+
+
+## more info on control operations
 
 There are cases where you might benefit from some sleep time, so there is OP_SLEEP, this command have an argument
 ```console

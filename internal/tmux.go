@@ -1,13 +1,15 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
-	"github.com/GianlucaP106/gotmux/gotmux"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/GianlucaP106/gotmux/gotmux"
 )
 
 type TmuxInData struct {
@@ -26,15 +28,6 @@ type TmuxInData struct {
 }
 
 func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
-	//	fmt.Println(ti.SeqName)
-	//	fmt.Println(ti.ScriptLines)
-	//	fmt.Println(ti.K8sConfig)
-	//	fmt.Println(ti.K8sContext)
-	//	fmt.Println(ti.K8sNamespace)
-	//	fmt.Println(ti.PodList)
-	//	fmt.Println(ti.SessionName)
-	//	fmt.Println(dry, syncExec, delTxSess)
-	//	fmt.Println("------====----")
 
 	if dry == true {
 		if !quiet {
@@ -59,14 +52,12 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 
 	if tmux.HasSession(tmuxSessionName) {
 		if !quiet {
-			fmt.Printf("# there is already session with this name (%s), ", tmuxSessionName)
+			fmt.Printf("# there is already tmux session (%s), ", tmuxSessionName)
 		}
 		if delTxSess == true {
-			cmd := exec.Command(os.Getenv("SHELL"), "-c", fmt.Sprintf("tmux kill-session -t %s\n", tmuxSessionName))
-			err := cmd.Run()
+			err := terminateTmuxSession(tmuxSessionName)
 			if err != nil {
 				fmt.Println(err)
-				fmt.Printf("unable to terminate session %s, exiting", tmuxSessionName)
 				return
 			}
 			if !quiet {
@@ -96,19 +87,15 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 		fmt.Printf("#### Creating windows per pod\n")
 	}
 	// open window per pod
-	for i := 0; i < len(ti.PodList); i++ {
-		newWinOpts := gotmux.NewWindowOptions{}
-		newWinOpts.WindowName = ti.PodList[i].PodName
-		_, err = tmuxSession.NewWindow(&newWinOpts)
-		if err != nil {
-			fmt.Println("error creating new window")
-			fmt.Println(err)
-			return
-		}
+	err = openNewWindowPerPod(tmuxSession, ti.PodList)
+	if err != nil {
+		fmt.Println("error creating new window")
+		fmt.Println(err)
+		return
 	}
 
 	// catch prompt, we could track it for each pod/window
-	// sleep for a while
+	// sleep for a while, prompt should stabilize
 	time.Sleep(time.Second * time.Duration(ti.PromptSleep))
 
 	windows, err = tmuxSession.ListWindows()
@@ -116,24 +103,13 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 	if !quiet {
 		fmt.Printf("#### Collecting prompts for each window\n")
 	}
-	prompts := make(map[int]string)
-	for i := 0; i < len(windows); i++ {
-		prompts[i], err = tmux_get_pane_prompt(windows[i])
-		if err != nil {
-			fmt.Println("error in fetching pane prompt")
-			return
-		}
-	}
-	winName2Idx := make(map[string]int)
-	windows, err = tmuxSession.ListWindows()
-	for i := 0; i < len(windows); i++ {
-		winName2Idx[windows[i].Name] = i
+	prompts, err := getInitialPrompts(windows)
+	if err != nil {
+		fmt.Println("error in fetching pane prompt")
+		return
 	}
 
-	podIdx2WinIdx := make(map[int]int)
-	for i := 0; i < len(ti.PodList); i++ {
-		podIdx2WinIdx[i] = winName2Idx[ti.PodList[i].PodName]
-	}
+	podIdx2WinIdx := getPodIdx2WinIdxMap(windows, ti.PodList)
 
 	if !quiet {
 		fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
@@ -159,7 +135,12 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 					err := windowsSendKeys(windows[podIdx2WinIdx[podIdx]], execLine+"\n")
 					if err != nil {
 						fmt.Println(err)
-						return
+						fmt.Println("error, removing %s from execution\n", ti.PodList[podIdx].PodName)
+						var tmp []PodsInfo
+						tmp = append(tmp, ti.PodList[:podIdx]...)
+						tmp = append(tmp, ti.PodList[podIdx+1:]...)
+						ti.PodList = tmp
+						break
 					}
 				}
 				doPromptCheck := true
@@ -176,6 +157,12 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 						for podIdx := 0; podIdx < len(ti.PodList); podIdx++ {
 							current_prompt, err := tmux_get_pane_prompt(windows[podIdx2WinIdx[podIdx]])
 							if err != nil {
+								fmt.Println("error, removing %s from execution\n", ti.PodList[podIdx].PodName)
+								var tmp []PodsInfo
+								tmp = append(tmp, ti.PodList[:podIdx]...)
+								tmp = append(tmp, ti.PodList[podIdx+1:]...)
+								ti.PodList = tmp
+
 								break
 							}
 							if current_prompt != prompts[podIdx] {
@@ -295,6 +282,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 							err := windowsSendKeys(windows[podIdx2WinIdx[podIdx]], execLine)
 							if err != nil {
 								fmt.Println(err)
+								fmt.Println("error, removing %s from execution\n", podName)
 								finalOp[podIdx] = OpUnknown
 								podStep[podIdx] = len(ti.ScriptLines)
 								break
@@ -313,7 +301,11 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 							time.Sleep(time.Millisecond * time.Duration(200))
 							current_prompt, err := tmux_get_pane_prompt(windows[podIdx2WinIdx[podIdx]])
 							if err != nil {
-								break // find way to singal error on execution
+								fmt.Println(err)
+								fmt.Println("error, removing %s from execution\n", podName)
+								finalOp[podIdx] = OpUnknown
+								podStep[podIdx] = len(ti.ScriptLines)
+								break
 							}
 							if current_prompt == prompts[podIdx] {
 								shouldWaitForPrompt[podIdx][scrIdx] = false
@@ -518,4 +510,59 @@ func internalSleep(line string) {
 	} else {
 		time.Sleep(time.Second * time.Duration(sleepSeconds))
 	}
+}
+
+func getInitialPrompts(windows []*gotmux.Window) (map[int]string, error) {
+
+	prompts := make(map[int]string)
+	for i := 0; i < len(windows); i++ {
+		var err error
+		prompts[i], err = tmux_get_pane_prompt(windows[i])
+		if err != nil {
+			newerr := errors.New("error in fetching pane prompt")
+			return prompts, newerr
+		}
+	}
+	return prompts, nil
+}
+
+func getPodIdx2WinIdxMap(windows []*gotmux.Window, podlist []PodsInfo) map[int]int {
+	winName2Idx := make(map[string]int)
+	for i := 0; i < len(windows); i++ {
+		winName2Idx[windows[i].Name] = i
+	}
+
+	podIdx2WinIdx := make(map[int]int)
+	for i := 0; i < len(podlist); i++ {
+		val, ok := winName2Idx[podlist[i].PodName]
+		if ok {
+			podIdx2WinIdx[i] = val
+		}
+	}
+
+	return podIdx2WinIdx
+}
+
+func openNewWindowPerPod(tmuxSession *gotmux.Session, podlist []PodsInfo) error {
+	for i := 0; i < len(podlist); i++ {
+		newWinOpts := gotmux.NewWindowOptions{}
+		newWinOpts.WindowName = podlist[i].PodName
+		_, err := tmuxSession.NewWindow(&newWinOpts)
+		if err != nil {
+			newerr := errors.New("error in fetching pane prompt")
+			return newerr
+		}
+	}
+	return nil
+}
+
+func terminateTmuxSession(tmuxSessionName string) error {
+	cmd := exec.Command(os.Getenv("SHELL"), "-c", fmt.Sprintf("tmux kill-session -t %s\n", tmuxSessionName))
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+		newerr := errors.New(fmt.Sprintf("unable to terminate session %s, exiting", tmuxSessionName))
+		return newerr
+	}
+	return nil
 }

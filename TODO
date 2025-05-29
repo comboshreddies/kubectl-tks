@@ -14,6 +14,7 @@ some additional functionality
 * add kct_cli shortcut that replaces field with kubectl switch options (same as _ but without kubectl)
 * add ability manipulate (create/update/delete) scripts, shortcuts and podMap from command line
 * conditional variables, used to put "-n namespace" if namespace is not empty or something like
+* add -X and -A for terminate and attach, overriding/forcing last terminal TERMINATE/ATTACH command from cli
 
 architecture:
 * switch to managing windows by pod-name not by index (as index can change)

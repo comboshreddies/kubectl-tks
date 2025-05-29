@@ -53,9 +53,12 @@ func OpenAndReadSequencefile(fileName string, quiet bool) (conf SequenceConfig, 
 				var x podMap
 				x.Name = key1
 				x.Rules = make(map[string]string)
-				for key2, val2 := range val1.(map[string]interface{}) {
-					x.Keys = append(x.Keys, key2)
-					x.Rules[key2] = val2.(string)
+				for i := 0; i < len(val1.([]interface{})); i++ {
+					item := val1.([]interface{})[i]
+					for key2, val2 := range item.(map[string]interface{}) {
+						x.Keys = append(x.Keys, key2)
+						x.Rules[key2] = val2.(string)
+					}
 				}
 				seq.PodCs = append(seq.PodCs, x)
 			}
@@ -202,7 +205,6 @@ func ExpandP2cRule(rules map[string]string, keys []string, pod string) string {
 	for i := 0; i < len(keys); i++ {
 		var err error = nil
 		matched := false
-		//fmt.Println(keys[i],rules[keys[i]],pod)
 		matched, err = regexp.Match(rules[keys[i]], []byte(pod))
 		if err != nil {
 			fmt.Println("Non fatal Error, failed in compiling p2c rules")

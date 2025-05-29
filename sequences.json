@@ -1,18 +1,18 @@
 {
   "podMap": {
-    "p2c": {
-      "busybox": "busybox.*",
-      "nginx": "nginx.*",
-      "main": ".*"
-    },
-    "p2cLogs": {
-      "busybox": "logs.*",
-      "main": ".*"
-    },
-    "p2sh": {
-      "/bin/bash" : "nginx.*",
-      "/bin/sh": ".*"
-    }
+    "p2c": [
+      { "busybox": "busybox.*" },
+      { "nginx": "nginx.*" },
+      { "main": ".*" }
+    ],
+    "p2cLogs": [
+      { "busybox": "logs.*" },
+      { "main": ".*" }
+    ],
+    "p2sh": [
+      { "/bin/bash" : "nginx.*" },
+      { "/bin/sh": ".*" }
+    ]
   },
   "shortcuts": {
     "LOGS_SWITCHES": " --prefix --timestamps --max-log-requests 100 ",

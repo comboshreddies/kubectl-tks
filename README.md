@@ -581,11 +581,11 @@ To make script reusable on various kinds pods there is podMap section of sequenc
 Below is a section that describe rules that would be used for mapping pod name to container name
 ```jsonl
 "podMap" : {
-    "p2c" : {
-        "busybox" : "busybox.*",
-        "nginx" : "nginx.*",
-        "main" : ".*"
-        },
+    "p2c" : [ 
+        { "busybox" : "busybox.*"},
+        {"nginx" : "nginx.*"},
+        {"main" : ".*"}
+        ],
 ```
 
 This rule say: there is a pod to container mapping named p2c, and rules are:
@@ -620,10 +620,10 @@ ie
 
 In some cases containers that do print logs are not the same container as one doing main job so you can specify new podMap section:
 ```jsonl
-   "p2cLogs" : {
-       "logger" : "busybox.*",
-       "main" : ".*"
-       }
+   "p2cLogs" : [ 
+       {"logger" : "busybox.*"},
+       {"main" : ".*"}
+       ]
 ```
 and you can use {{p2cLogs}} field template in your scripts.
 Here we assume that those pods that match podname 'busybox.*' do have separate container named logger that
@@ -777,11 +777,11 @@ A: use podMap section of sequences.json file (~/.tks/sequences.json)
 
 ```jsonl
 "podMap" : {
-    "p2c" : {
-        "busybox" : "busybox.*",
-        "nginx" : "nginx.*",
-        "main" : ".*"
-        },
+    "p2c" : [ 
+        {"busybox" : "busybox.*"},
+        {"nginx" : "nginx.*"},
+        {"main" : ".*"}
+        ],
 ```
 then use {{p2c}} in the kubectl command line.
 You can have more than one item, so if you need different pod name to container mapper define
@@ -814,19 +814,19 @@ busybox for busybox pods and nginx for nginx pods.
 ## Q: How to use same script for different types of pods with different shells or different package managers?
 A: Create podMap section (for example for ldap2 package that has different names in alpine and debian) like:
 ```console
-'p2inst': {
-   "apt install -y" : "debian-pod-name.*",
-   "apk add" : "alpine-pod-name.*",
-   "yum install -y" : "centos-pod-name.*"
-},
-"p2sh" : {
-   "/bin/sh" : "busybox.*",
-   "/bin/bash" : ".*"
-},
-"p2LdapPack" : {
-   "libldap2-dev" : "debian.*",
-   "openldap-dev" : "alpine.*"
-},
+'p2inst': [ 
+   { "apt install -y" : "debian-pod-name.*"},
+   { "apk add" : "alpine-pod-name.*"},
+   { "yum install -y" : "centos-pod-name.*"}
+],
+"p2sh" : [
+   {"/bin/sh" : "busybox.*"},
+   {"/bin/bash" : ".*"}
+],
+"p2LdapPack" : [
+   {"libldap2-dev" : "debian.*"},
+   {"openldap-dev" : "alpine.*"}
+],
 ```
 then use in scripts or one-liners like
 ```console

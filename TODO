@@ -13,6 +13,8 @@ feature:
 * In k8s.go consider recording containers name list []string, currently not needed, maybe for
 some additional functionality
 * add kct_cli shortcut that replaces field with kubectl switch options (same as _ but without kubectl)
+* add ability manipulate (create/update/delete) scripts, shortcuts and podMap from command line
+* conditional variables, used to put "-n namespace" if namespace is not empty or something like
 
 architecture:
 * switch to managing windows by pod-name not by index (as index can change)

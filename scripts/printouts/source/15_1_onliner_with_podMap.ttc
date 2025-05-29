@@ -1,0 +1,7 @@
+tmux kill-session
+tmux kill-session
+tmux kill-session
+termtosvg ../s_15_1_tks.svg
+kubectl tks -n test-run start -l app=nginx  "_ exec -t {{pod}} -c {{p2c}} -- env" -d
+
+exit

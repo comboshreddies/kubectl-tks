@@ -1,7 +1,6 @@
 TODO:
 
 code quality:
-* change list.go to use opDecode - do not implement parsing more than once
 * implement error wrapping, unwrapping
 
 feature:

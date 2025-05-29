@@ -420,7 +420,7 @@ func dryRenderLine(ti TmuxInData, podListIndex, scriptLineIndex int, syncExec bo
 	op := OpExecute
 
 	if (len(original) > 3 && original[:3] == "{{_") || (len(original) > 5 && original[:2] == "{{") {
-		op, line = OpLineTagToString(original)
+		op, line = OpLineTagToOpString(original)
 		original = line
 	}
 	line = ExpandShortcuts(original, ti.Shorts, ti.ShortsKeys)
@@ -461,7 +461,7 @@ func RenderLineForExec(ti TmuxInData, podListIndex, scriptLineIndex int) string 
 	var line string
 	if (len(original) > 3 && original[:3] == "{{_") || (len(original) > 5 && original[:5] == "{{OP_") {
 		// should not match, but if we do, put # shell comment
-		op, line := OpLineTagToString(original)
+		op, line := OpLineTagToOpString(original)
 		if op == OpComment { // opComment is only non OpExec that is Rendered for exec
 			original = fmt.Sprintf("#%s", line)
 		} else {

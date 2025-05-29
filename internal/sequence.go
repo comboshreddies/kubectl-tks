@@ -129,10 +129,6 @@ func OpLineTagToOpString(line string) (op OpDecoded, opLine string) {
 	return retOperation, retLine
 }
 
-func OpLineTagToString(line string) (op OpDecoded, outLine string) {
-	return OpLineTagToOpString(line)
-}
-
 func ExpandShortcuts(line string, shorts map[string]string, keys []string) string {
 	newLine := line
 	for l := 0; l < 100; l++ {
@@ -355,7 +351,7 @@ var OpName = map[OpDecoded]string{
 
 func opDecode(inputLine string) (op OpDecoded, line string) {
 	if len(inputLine) > 5 && inputLine[:2] == "{{" {
-		op, line = OpLineTagToString(inputLine)
+		op, line = OpLineTagToOpString(inputLine)
 		if op == OpUnknown {
 			return OpExecute, line
 		} else {

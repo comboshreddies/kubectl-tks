@@ -74,7 +74,7 @@ func processInfo(cmd *cobra.Command, args []string) {
 				item := seq.Scripts[i].Items[j]
 				fmt.Printf("Script line %d :\n", j)
 				if (len(item) > 3 && item[:3] == "{{_") || (len(item) > 5 && item[:4] == "{{OP_") {
-					op, line := internal.OpLineTagToString(item)
+					op, line := internal.OpLineTagToOpString(item)
 					fmt.Printf("%s:%s\n", internal.OpInstruction[op], line)
 				} else {
 					if o.ExpandSeq {

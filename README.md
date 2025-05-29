@@ -7,7 +7,7 @@ Each window runs a script on one pod. You can decide if you want to attach and i
 executions per each pod, or you want to just execute and exit tmux.
 
 As a good practice you should not run things on pods/containers, but if you do,
-and if you frequently and on many different pods namespaces, cluster, then
+and if you do frequently and on many different pods namespaces, cluster, then
 this tool might be helpful.
 
 With this tool you can:
@@ -762,7 +762,7 @@ Above there are 3 deployments nginx-sample1, nginx-sample2 and busybox1, and -c 
 busybox for busybox pods and nginx for nginx pods.
 
 ## Q: How to use same script for different types of pods with different shells or different package managers?
-A: Create podMap section like:
+A: Create podMap section (for example for ldap2 package that has different names in alpine and debian) like:
 ```console
 'p2inst': {
    "apt install -y" : "debian-pod-name.*",
@@ -773,20 +773,25 @@ A: Create podMap section like:
    "/bin/sh" : "busybox.*",
    "/bin/bash" : ".*"
 },
-"p2pack" : {
+"p2LdapPack" : {
    "libldap2-dev" : "debian.*",
    "openldap-dev" : "alpine.*"
 },
 ```
 then use in scripts or one-liners like
 ```console
-"kubectl --context {{ctx}} -n {{nsp}} exec {{pod}} -c {{p2c}} -- {{p2sh}} -c '{{p2inst}} {{p2pack}}'"
+"kubectl --context {{ctx}} -n {{nsp}} exec {{pod}} -c {{p2c}} -- {{p2sh}} -c '{{p2inst}} {{p2LdapPack}}'"
 ```
 or with shorcuts
 ```console
-"{{EC}} {{p2sh}} -c '{{p2inst}} {{p2pack}}'"
+"{{EC}} {{p2sh}} -c '{{p2inst}} {{p2Ldapappck}}'"
 ```
-or you can make whole line a signe shortcut if you want to extend it later.
+or you can make whole line a single shortcut .
+put in shortucts:
+```
+"INSTALL" : "{{EC}} {{p2sh}} -c '{{p2inst}}",
+"INSTALL_LDAP" : "{{INSTALL}} {{p2Ldapappck}}'"
+```
 
 
 # Best practice:
@@ -799,11 +804,10 @@ your execution might be left running on a pod for a very long time, and affect n
 for example if you are running tcpdump, do create sequence to kill any tcpdump that might be left running
 
 - if you need longer set of sequences, then frequent kubectl exec sequence is not optimal. You have two
-options. One is to create local script, then on each tmux-windows/pod customize script
-copy script to pod/container, run script, copy back results. Second is to interactivelly exec to kube pod
-(kubect exec -it ) and then request {{OP_NO_PROMPT_WAIT}} and then {{OP_REFRESH_PROMPT}}. Those commands
-will instruct tks not to wait for prompt, and to load new prompt line in tks state.
-
-
+options. 
+One is to create local script, then copy script to pod/container, run script, copy back results - in 
+total 3 kubectl actions: copy script, exec script, copy results. 
+Second is to interactivelly exec to kube pod (kubect exec -it ) and then request {{OP_NO_PROMPT_WAIT}} and then {{OP_REFRESH_PROMPT}}. Those commands will instruct tks not to wait for prompt, and to load new prompt line in tks state.
+In this way you can keep kubectl interactive session open and continue to send instructions to pod/container.
 
 

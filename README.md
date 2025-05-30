@@ -1,13 +1,13 @@
 ##   Tmux Kubectl Scripts - tks
-# tks kubectl plugin - or standalone tool
+# tks: kubectl plugin - or standalone tool
 ## A plugin for executing scripts on pods within tmux windows:
 
 Tks plugin runs multiple execution scripts (sequences) in multiple tmux windows.
 Each window runs a script on one pod. You can decide if you want to attach and inspect
 executions per each pod, or you want to just execute and exit tmux.
 
-As a good practice you should not run things on pods/containers, but if you do,
-and if you do frequently and on many different pods namespaces, cluster, then
+As a good practice you should not run too much CLI exec things on pods/containers, but if you do,
+and if you do frequently and on many different pods namespaces, clusters, then
 this tool might be helpful.
 
 With this tool you can:
@@ -15,7 +15,7 @@ With this tool you can:
 ```console
 "exec {{pod}} -c {{p2c}}  -- /bin/sh `env > {{k8s_pod}}.env`"
 ```
-tks will automatically change pod name namespace and for each execution step
+tks will automatically change pod name and find correct p2c mapping for container for each execution step
 
 2) you can select by namespace, label, then filter specific pods, like:
 ```console
@@ -35,7 +35,7 @@ If you have some actions that you frequently do, like gathering some info from p
 can add a sequence that fits your needs, and next time you can run it fast. Tmux solves
 problem of having multiple outputs of executions on same terminal, as each tmux screen/window
 is dedicated to one pod execution, so you have terminal for each pod, do ctrl+b+n and
-go to the next pod window.
+go to the next tmux-pod window.
 
 
 ## Installation
@@ -543,6 +543,7 @@ of how ECV resolution is being done:
 * _ is dynamic shortcut (tks implemented) that repeats kubectl options (context, namespace, config)
 * p2c is podMap that maps every podname like 'nginx.*' to 'nginx', that is how from {{p2c}} tks got nginx
 
+
 example for specific pod nginx-sample1-59d677c5cb-flpft:
 kubectl -n test-run exec nginx-sample1-59d677c5cb-flpft -c nginx -- /bin/bash -c  date
 
@@ -551,7 +552,7 @@ EC - Exec to Container
 ECB - Exec to Conatiner Bash
 Excessive shortened naming are used so one-liners and script lines look short 
 and fit for this documentation. Use more reasonable ones for your purpose.
-
+Name p2c for the podMap is shortcut for pod to container.
 
 ### sequence - how template fields are replaced and in which order
 
@@ -784,7 +785,7 @@ A: use podMap section of sequences.json file (~/.tks/sequences.json)
         ],
 ```
 then use {{p2c}} in the kubectl command line.
-You can have more than one item, so if you need different pod name to container mapper define
+You can have more than one podMap item, so if you need different pod name to container mapper define
 different set of rules.
 
 here is an example of dry run showing how p2c converts podname to correct container name
@@ -808,7 +809,7 @@ nginx-sample2-5ffd775bc4-5lkpx 6 0 kubectl -n test-run exec nginx-sample2-5ffd77
 nginx-sample2-5ffd775bc4-9br96 7 0 kubectl -n test-run exec nginx-sample2-5ffd775bc4-9br96 -c nginx -- env
 nginx-sample2-5ffd775bc4-tcqn9 8 0 kubectl -n test-run exec nginx-sample2-5ffd775bc4-tcqn9 -c nginx -- env
 ```
-Above there are 3 deployments nginx-sample1, nginx-sample2 and busybox1, and -c (container) parameter is
+Above shows there are 3 deployments nginx-sample1, nginx-sample2 and busybox1, and -c (container) parameter is
 busybox for busybox pods and nginx for nginx pods.
 
 ## Q: How to use same script for different types of pods with different shells or different package managers?
@@ -842,7 +843,10 @@ put in shortucts:
 "INSTALL" : "{{EC}} {{p2sh}} -c '{{p2inst}}",
 "INSTALL_LDAP" : "{{INSTALL}} {{p2Ldapappck}}'"
 ```
-
+and now you can run weather you have yum,dep/apt, or apk distro on container
+```console
+kubectl tks -n test-run start -l app=nginx "{{INSTALL_LDAP}}
+```
 
 # Best practice:
 - use OP_INFO as a first line of a script as it will be used as a help line for script

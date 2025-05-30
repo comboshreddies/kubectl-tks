@@ -5,37 +5,41 @@ import (
 )
 
 type CliOptions struct {
-	ScriptFile     string
-	ExpandSeq      bool
-	K8sConfig      string
-	K8sContext     string
-	K8sNamespace   string
-	K8sSelector    string
-	KTxDryRun      bool
-	KTxSync        bool
-	KTxQuiet       bool
-	KTxTermSess    bool
-	KTxPodList     string
-	KTxPrompt      string
-	KTxPromptSleep int
-	KTxSessionName string
+	ScriptFile      string
+	ExpandSeq       bool
+	K8sConfig       string
+	K8sContext      string
+	K8sNamespace    string
+	K8sSelector     string
+	KTxDryRun       bool
+	KTxSync         bool
+	KTxQuiet        bool
+	KTxTermPrevSess bool
+	KTxTermCurrSess bool
+	KTxAttachSess   bool
+	KTxPodList      string
+	KTxPrompt       string
+	KTxPromptSleep  int
+	KTxSessionName  string
 }
 
 var o = CliOptions{
-	ScriptFile:     "",
-	ExpandSeq:      false,
-	K8sConfig:      "~/.kube/config",
-	K8sContext:     "",
-	K8sNamespace:   "",
-	K8sSelector:    "",
-	KTxDryRun:      false,
-	KTxSync:        false,
-	KTxQuiet:       false,
-	KTxTermSess:    false,
-	KTxPodList:     "",
-	KTxPrompt:      "",
-	KTxPromptSleep: 0,
-	KTxSessionName: "",
+	ScriptFile:      "",
+	ExpandSeq:       false,
+	K8sConfig:       "~/.kube/config",
+	K8sContext:      "",
+	K8sNamespace:    "",
+	K8sSelector:     "",
+	KTxDryRun:       false,
+	KTxSync:         false,
+	KTxQuiet:        false,
+	KTxTermPrevSess: false,
+	KTxTermCurrSess: false,
+	KTxAttachSess:   false,
+	KTxPodList:      "",
+	KTxPrompt:       "",
+	KTxPromptSleep:  0,
+	KTxSessionName:  "",
 }
 
 //var scriptFile     string

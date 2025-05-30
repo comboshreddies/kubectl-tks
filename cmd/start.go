@@ -20,7 +20,9 @@ func init() {
 	cmdStart.Flags().BoolVarP(&o.KTxDryRun, "dry", "d", false, "start a dry run, no script execution")
 	cmdStart.Flags().BoolVarP(&o.KTxSync, "sync", "s", false, "run in sync step mode")
 	cmdStart.Flags().BoolVarP(&o.KTxQuiet, "quiet", "q", false, "run in quiet mode")
-	cmdStart.Flags().BoolVarP(&o.KTxTermSess, "term", "T", false, "terminate tmux session if exists, before starting")
+	cmdStart.Flags().BoolVarP(&o.KTxTermPrevSess, "termPrev", "T", false, "kill session if exists, before starting")
+	cmdStart.Flags().BoolVarP(&o.KTxTermCurrSess, "term", "X", false, "terminate session, override script")
+	cmdStart.Flags().BoolVarP(&o.KTxAttachSess, "attach", "A", false, "attach tmux session, override script")
 	cmdStart.Flags().StringVarP(&o.KTxSessionName, "sessionName", "S", "", "tmux session name")
 	cmdStart.Flags().StringVarP(&o.KTxPodList, "pods", "p", "", "set list of pods, comma separated")
 	cmdStart.Flags().StringVarP(&o.KTxPrompt, "Prompt", "P", "", "tmux define prompt")
@@ -37,9 +39,11 @@ var cmdStart = &cobra.Command{
 }
 
 func processStart(cmd *cobra.Command, args []string) {
-	//	fmt.Println("start: .... ")
-	//	fmt.Println(args)
-	//        fmt.Printf("dry %t sync %t\n",o.KTxDryRun, o.KTxSync)
+
+	if o.KTxAttachSess == true && o.KTxTermCurrSess == true {
+		fmt.Println("start can't have both -A and -X, choose one, exiting")
+		return
+	}
 
 	noConfFile := false
 	seq := internal.SequenceConfig{}
@@ -147,5 +151,5 @@ func processStart(cmd *cobra.Command, args []string) {
 	tmuxIn.PromptSleep = o.KTxPromptSleep
 	tmuxIn.SessionName = o.KTxSessionName
 
-	internal.StartTmux(tmuxIn, o.KTxDryRun, o.KTxSync, o.KTxTermSess, o.KTxQuiet)
+	internal.StartTmux(tmuxIn, o.KTxDryRun, o.KTxSync, o.KTxTermPrevSess, o.KTxTermCurrSess, o.KTxAttachSess, o.KTxQuiet)
 }

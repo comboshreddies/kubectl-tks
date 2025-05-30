@@ -27,11 +27,11 @@ type TmuxInData struct {
 	SessionName  string
 }
 
-func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
+func StartTmux(ti TmuxInData, dry, syncExec, delTxPrevSess, termCurrSess, attachCurrSess, quiet bool) {
 
 	if dry == true {
 		if !quiet {
-			fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
+			fmt.Printf("#### Starting execution: sync : %t, dry : %t, attach: %t, term %t\n", syncExec, dry, termCurrSess, attachCurrSess)
 		}
 		dryRunPrintOut(ti, syncExec)
 		return
@@ -54,7 +54,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 		if !quiet {
 			fmt.Printf("# there is already tmux session (%s), ", tmuxSessionName)
 		}
-		if delTxSess == true {
+		if delTxPrevSess == true {
 			err := terminateTmuxSession(tmuxSessionName)
 			if err != nil {
 				fmt.Println(err)
@@ -201,16 +201,20 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 			}
 			switch operation {
 			case OpTerminate:
-				fmt.Println("#TERMINATE")
-				windows, err = tmuxSession.ListWindows()
-				for i := 0; i < len(windows); i++ {
-					windows[i].Kill()
+				if !attachCurrSess {
+					fmt.Println("#TERMINATE")
+					windows, err = tmuxSession.ListWindows()
+					for i := 0; i < len(windows); i++ {
+						windows[i].Kill()
+					}
+					fmt.Println("windows within session terminated")
 				}
-				fmt.Println("windows within session terminated")
 			case OpAttach:
-				fmt.Println("#ATTACH")
-				opts := gotmux.AttachSessionOptions{}
-				tmuxSession.AttachSession(&opts)
+				if !termCurrSess {
+					fmt.Println("#ATTACH")
+					opts := gotmux.AttachSessionOptions{}
+					tmuxSession.AttachSession(&opts)
+				}
 			case OpDetach:
 				fmt.Println("#DETACH")
 			case OpFinally:
@@ -220,6 +224,19 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 				if err != nil {
 					fmt.Println(err)
 					return
+				}
+			}
+			if attachCurrSess {
+				fmt.Println("#ATTACH:cli-forced")
+				opts := gotmux.AttachSessionOptions{}
+				tmuxSession.AttachSession(&opts)
+
+			}
+			if termCurrSess {
+				fmt.Println("#TERMINATE:cli-forced")
+				windows, err = tmuxSession.ListWindows()
+				for i := 0; i < len(windows); i++ {
+					windows[i].Kill()
 				}
 			}
 		}
@@ -357,16 +374,20 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 		if lastOperation != OpUnknown {
 			switch lastOperation {
 			case OpTerminate:
-				fmt.Println("#TERMINATE")
-				windows, err = tmuxSession.ListWindows()
-				for i := 0; i < len(windows); i++ {
-					windows[i].Kill()
+				if !attachCurrSess {
+					fmt.Println("#TERMINATE")
+					windows, err = tmuxSession.ListWindows()
+					for i := 0; i < len(windows); i++ {
+						windows[i].Kill()
+					}
+					fmt.Println("# windows within session terminated")
 				}
-				fmt.Println("# windows within session terminated")
 			case OpAttach:
-				fmt.Println("#ATTACH")
-				opts := gotmux.AttachSessionOptions{}
-				tmuxSession.AttachSession(&opts)
+				if !termCurrSess {
+					fmt.Println("#ATTACH")
+					opts := gotmux.AttachSessionOptions{}
+					tmuxSession.AttachSession(&opts)
+				}
 			case OpFinally:
 				fmt.Printf("#FINAL_EXEC: %s\n", lastLine)
 				cmd := exec.Command(os.Getenv("SHELL"), "-c", lastLine)
@@ -377,6 +398,20 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxSess, quiet bool) {
 
 			}
 		}
+		if attachCurrSess {
+			fmt.Println("#ATTACH:cli-forced")
+			opts := gotmux.AttachSessionOptions{}
+			tmuxSession.AttachSession(&opts)
+
+		}
+		if termCurrSess {
+			fmt.Println("#TERMINATE:cli-forced")
+			windows, err = tmuxSession.ListWindows()
+			for i := 0; i < len(windows); i++ {
+				windows[i].Kill()
+			}
+		}
+
 	}
 	fmt.Println("#COMPLETED")
 	return

@@ -114,6 +114,7 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxPrevSess, termCurrSess, attach
 	if !quiet {
 		fmt.Printf("#### Starting execution: sync : %t, dry : %t\n", syncExec, dry)
 	}
+
 	if syncExec == true {
 		line := ""
 		var operation OpDecoded

@@ -19,3 +19,5 @@ architecture:
 * switch to managing windows by pod-name not by index (as index can change)
   -R as alternative to -T to reuse not to terminate, should wait for managing windows by pod-name
 
+* add -W - sloW option, to execute one by one pod  (as in sync but with one by one pode, so no -W assumes sync)
+

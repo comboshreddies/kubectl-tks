@@ -47,6 +47,7 @@ Additional step, not needed but useful, can be done later
 3) mkdir  ~/.tks
 4) copy sequences.json to ~/.tks/
 
+kubectl-tks should be installable via krew plugin too.
 
 # purpose
 One can easily make a shell script to execute some command on each pod/container in parallel, then gather results.
@@ -73,7 +74,7 @@ kubectl -n test-run get pod -l app=nginx
 ## One-liner example
 
 
-One-liner example is nice way to start but real power comes with scripts that are tailored for purpose.
+One-liner example is nice way to start, but real power comes with scripts that are tailored for purpose.
 
 One-liners are designed to be short, but they might not be easily readable. Power
 of one-liners come with prepared scripts and shortcuts, but will start with empty state
@@ -686,7 +687,7 @@ kubectl tks -n test-run start remote-exec -l app=nginx -q
 ![s_14_2_tks.svg](https://github.com/comboshreddies/kubectl-tks/blob/main/scripts/printouts/recorded/s_14_2_tks.svg?raw=true)
 
 
-## capturing files on pods then copy then to local
+## capturing files on pods then copy them to local
 
 Another nice script in sequences.json is tcpdump-all
 

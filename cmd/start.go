@@ -21,7 +21,7 @@ func init() {
 	cmdStart.Flags().BoolVarP(&o.KTxSync, "sync", "s", false, "run in sync step mode")
 	cmdStart.Flags().BoolVarP(&o.KTxQuiet, "quiet", "q", false, "run in quiet mode")
 	cmdStart.Flags().BoolVarP(&o.KTxTermPrevSess, "termPrev", "T", false, "kill session if exists, before starting")
-	cmdStart.Flags().BoolVarP(&o.KTxTermCurrSess, "term", "X", false, "terminate session, override script")
+	cmdStart.Flags().BoolVarP(&o.KTxTermCurrSess, "term", "X", false, "terminate session as final step, overrides script")
 	cmdStart.Flags().BoolVarP(&o.KTxAttachSess, "postAttach", "A", false, "attach tmux session, override script")
 	cmdStart.Flags().StringVarP(&o.KTxSessionName, "sessionName", "S", "", "tmux session name")
 	cmdStart.Flags().StringVarP(&o.KTxPodList, "pods", "p", "", "set list of pods, comma separated")

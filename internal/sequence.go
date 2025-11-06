@@ -2,13 +2,19 @@ package internal
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"regexp"
 	"slices"
 	"strings"
+)
+
+const (
+	// MaxExpansionIterations is the maximum number of iterations for template expansion
+	MaxExpansionIterations = 100
+	// MaxReplacementsPerIteration is the maximum number of replacements per iteration
+	MaxReplacementsPerIteration = 10
 )
 
 type scriptItem struct {
@@ -34,17 +40,19 @@ func OpenAndReadSequencefile(fileName string, quiet bool) (conf SequenceConfig, 
 
 	jsonFile, err := os.Open(fileName)
 	if err != nil {
-		return SequenceConfig{}, errors.New("# unable to open sequence json file " + fileName)
+		return SequenceConfig{}, fmt.Errorf("unable to open sequence json file %s: %w", fileName, err)
 	}
 	defer jsonFile.Close()
 
-	byteValue, _ := ioutil.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(jsonFile)
+	if err != nil {
+		return SequenceConfig{}, fmt.Errorf("unable to read sequence json file %s: %w", fileName, err)
+	}
 
 	var result map[string]interface{}
-	err = json.Unmarshal([]byte(byteValue), &result)
+	err = json.Unmarshal(byteValue, &result)
 	if err != nil {
-		newerr := errors.New("# unable to load json from sequence json file")
-		return SequenceConfig{}, newerr
+		return SequenceConfig{}, fmt.Errorf("unable to load json from sequence json file %s: %w", fileName, err)
 	}
 
 	for key, val := range result {
@@ -134,12 +142,12 @@ func OpLineTagToOpString(line string) (op OpDecoded, opLine string) {
 
 func ExpandShortcuts(line string, shorts map[string]string, keys []string) string {
 	newLine := line
-	for l := 0; l < 100; l++ {
+	for l := 0; l < MaxExpansionIterations; l++ {
 		changes := false
 		for i := 0; i < len(keys); i++ {
 			key := keys[i]
 			value := shorts[key]
-			after := strings.Replace(newLine, "{{"+key+"}}", value, 10)
+			after := strings.Replace(newLine, "{{"+key+"}}", value, MaxReplacementsPerIteration)
 			if after != newLine {
 				changes = true
 				newLine = after
@@ -175,20 +183,21 @@ func ExpandUnderscore(line, K8sConfig, K8sContext, K8sNamespace string) string {
 
 func ExpandK8s(line, K8sConfig, K8sContext, K8sNamespace, K8sPod string) string {
 	newLine := line
-	for l := 0; l < 100; l++ {
+	for l := 0; l < MaxExpansionIterations; l++ {
 		changes := false
-		after := strings.Replace(newLine, "{{k8s_config}}", K8sConfig, 10)
-		after = strings.Replace(after, "{{k8s_context}}", K8sContext, 10)
-		after = strings.Replace(after, "{{k8s_namespace}}", K8sNamespace, 10)
-		after = strings.Replace(after, "{{k8s_pod}}", K8sPod, 10)
-		after = strings.Replace(after, "{{cnf}}", K8sConfig, 10)
-		after = strings.Replace(after, "{{ctx}}", K8sContext, 10)
-		after = strings.Replace(after, "{{nsp}}", K8sNamespace, 10)
-		after = strings.Replace(after, "{{pod}}", K8sPod, 10)
-		after = strings.Replace(after, "{{cnf}}", K8sConfig, 10)
-		after = strings.Replace(after, "{{ctx}}", K8sContext, 10)
-		after = strings.Replace(after, "{{nsp}}", K8sNamespace, 10)
-		after = strings.Replace(after, "{{pod}}", K8sPod, 10)
+		after := strings.Replace(newLine, "{{k8s_config}}", K8sConfig, MaxReplacementsPerIteration)
+		after = strings.Replace(after, "{{k8s_context}}", K8sContext, MaxReplacementsPerIteration)
+		after = strings.Replace(after, "{{k8s_namespace}}", K8sNamespace, MaxReplacementsPerIteration)
+		after = strings.Replace(after, "{{k8s_pod}}", K8sPod, MaxReplacementsPerIteration)
+		after = strings.Replace(after, "{{cnf}}", K8sConfig, MaxReplacementsPerIteration)
+		after = strings.Replace(after, "{{ctx}}", K8sContext, MaxReplacementsPerIteration)
+		after = strings.Replace(after, "{{nsp}}", K8sNamespace, MaxReplacementsPerIteration)
+		after = strings.Replace(after, "{{pod}}", K8sPod, MaxReplacementsPerIteration)
+		// Remove duplicate replacements (they were already done above)
+		// after = strings.Replace(after, "{{cnf}}", K8sConfig, MaxReplacementsPerIteration)
+		// after = strings.Replace(after, "{{ctx}}", K8sContext, MaxReplacementsPerIteration)
+		// after = strings.Replace(after, "{{nsp}}", K8sNamespace, MaxReplacementsPerIteration)
+		// after = strings.Replace(after, "{{pod}}", K8sPod, MaxReplacementsPerIteration)
 
 		if after != newLine {
 			changes = true
@@ -203,12 +212,11 @@ func ExpandK8s(line, K8sConfig, K8sContext, K8sNamespace, K8sPod string) string 
 
 func ExpandP2cRule(rules map[string]string, keys []string, pod string) string {
 	for i := 0; i < len(keys); i++ {
-		var err error = nil
+		var err error
 		matched := false
 		matched, err = regexp.Match(rules[keys[i]], []byte(pod))
 		if err != nil {
-			fmt.Println("Non fatal Error, failed in compiling p2c rules")
-			fmt.Println(err)
+			fmt.Printf("non-fatal error, failed in compiling p2c rules for key %s: %v\n", keys[i], err)
 			continue
 		}
 		if matched {
@@ -220,10 +228,10 @@ func ExpandP2cRule(rules map[string]string, keys []string, pod string) string {
 
 func ExpandPodMapper(line, K8s_pod string, p2c []podMap) string {
 	newLine := line
-	for l := 0; l < 100; l++ {
+	for l := 0; l < MaxExpansionIterations; l++ {
 		changes := false
 		for k := range p2c {
-			after := strings.Replace(newLine, "{{"+p2c[k].Name+"}}", ExpandP2cRule(p2c[k].Rules, p2c[k].Keys, K8s_pod), 10)
+			after := strings.Replace(newLine, "{{"+p2c[k].Name+"}}", ExpandP2cRule(p2c[k].Rules, p2c[k].Keys, K8s_pod), MaxReplacementsPerIteration)
 			if after != newLine {
 				changes = true
 				newLine = after
@@ -247,7 +255,7 @@ func IsThereAScript(name string, scripts []scriptItem) (offset int, err error) {
 	}
 
 	if !match {
-		return -1, errors.New(fmt.Sprintf("# No matching script %s in conf file", name))
+		return -1, fmt.Errorf("no matching script %s in conf file", name)
 	}
 	return seqOffset, nil
 }

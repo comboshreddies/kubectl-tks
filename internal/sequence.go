@@ -12,7 +12,7 @@ import (
 
 const (
 	// MaxExpansionIterations is the maximum number of iterations for template expansion
-	MaxExpansionIterations = 100
+	MaxExpansionIterations = 10
 	// MaxReplacementsPerIteration is the maximum number of replacements per iteration
 	MaxReplacementsPerIteration = 10
 )
@@ -193,11 +193,6 @@ func ExpandK8s(line, K8sConfig, K8sContext, K8sNamespace, K8sPod string) string 
 		after = strings.Replace(after, "{{ctx}}", K8sContext, MaxReplacementsPerIteration)
 		after = strings.Replace(after, "{{nsp}}", K8sNamespace, MaxReplacementsPerIteration)
 		after = strings.Replace(after, "{{pod}}", K8sPod, MaxReplacementsPerIteration)
-		// Remove duplicate replacements (they were already done above)
-		// after = strings.Replace(after, "{{cnf}}", K8sConfig, MaxReplacementsPerIteration)
-		// after = strings.Replace(after, "{{ctx}}", K8sContext, MaxReplacementsPerIteration)
-		// after = strings.Replace(after, "{{nsp}}", K8sNamespace, MaxReplacementsPerIteration)
-		// after = strings.Replace(after, "{{pod}}", K8sPod, MaxReplacementsPerIteration)
 
 		if after != newLine {
 			changes = true

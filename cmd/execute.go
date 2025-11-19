@@ -21,6 +21,7 @@ type CliOptions struct {
 	KTxPrompt       string
 	KTxPromptSleep  int
 	KTxSessionName  string
+	KTxSyncTimeout  int
 }
 
 var o = CliOptions{
@@ -40,6 +41,7 @@ var o = CliOptions{
 	KTxPrompt:       "",
 	KTxPromptSleep:  0,
 	KTxSessionName:  "",
+	KTxSyncTimeout:  300,
 }
 
 //var scriptFile     string

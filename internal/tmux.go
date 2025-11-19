@@ -33,7 +33,7 @@ type TmuxInData struct {
 	SessionName  string
 }
 
-func StartTmux(ti TmuxInData, dry, syncExec, delTxPrevSess, termCurrSess, attachCurrSess, quiet bool) {
+func StartTmux(ti TmuxInData, dry, syncExec, delTxPrevSess, termCurrSess, attachCurrSess, quiet bool, syncTimeout int) {
 
 	if dry == true {
 		if !quiet {
@@ -158,7 +158,12 @@ func StartTmux(ti TmuxInData, dry, syncExec, delTxPrevSess, termCurrSess, attach
 				}
 				if doPromptCheck == true {
 					allComplete := false
+					startTime := time.Now()
 					for allComplete == false {
+						if time.Since(startTime) > time.Duration(syncTimeout)*time.Second {
+							fmt.Println("# SYNC TIMEOUT")
+							break
+						}
 						allComplete = true
 						for podIdx := 0; podIdx < len(ti.PodList); podIdx++ {
 							current_prompt, err := tmux_get_pane_prompt(windows[podIdx2WinIdx[podIdx]])

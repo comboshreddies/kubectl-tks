@@ -27,6 +27,7 @@ func init() {
 	cmdStart.Flags().StringVarP(&o.KTxPodList, "pods", "p", "", "set list of pods, comma separated")
 	cmdStart.Flags().StringVarP(&o.KTxPrompt, "Prompt", "P", "", "tmux define prompt")
 	cmdStart.Flags().IntVarP(&o.KTxPromptSleep, "sleepTime", "t", 2, "sleep seconds before catching prompt")
+	cmdStart.Flags().IntVar(&o.KTxSyncTimeout, "sync-timeout", 300, "sync mode prompt check timeout in seconds")
 	rootCmd.AddCommand(cmdStart)
 }
 
@@ -137,6 +138,13 @@ func processStart(cmd *cobra.Command, args []string) {
 		filteredPodList = podList
 	}
 
+	if len(filteredPodList) == 0 {
+		if !o.KTxQuiet {
+			fmt.Println("# No pods found matching the criteria.")
+		}
+		return
+	}
+
 	tmuxIn := internal.TmuxInData{}
 	tmuxIn.SeqName = scriptName
 	tmuxIn.ScriptLines = scriptLines
@@ -151,5 +159,5 @@ func processStart(cmd *cobra.Command, args []string) {
 	tmuxIn.PromptSleep = o.KTxPromptSleep
 	tmuxIn.SessionName = o.KTxSessionName
 
-	internal.StartTmux(tmuxIn, o.KTxDryRun, o.KTxSync, o.KTxTermPrevSess, o.KTxTermCurrSess, o.KTxAttachSess, o.KTxQuiet)
+	internal.StartTmux(tmuxIn, o.KTxDryRun, o.KTxSync, o.KTxTermPrevSess, o.KTxTermCurrSess, o.KTxAttachSess, o.KTxQuiet, o.KTxSyncTimeout)
 }
